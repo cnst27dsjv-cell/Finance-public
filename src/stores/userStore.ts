@@ -38,6 +38,7 @@ export interface AutoInvestPlan {
   createTime: number
   nextExecuteTime: number
   status: 'active' | 'paused' | 'cancelled'
+  pauseReason?: 'stop_loss' | 'manual'
   executedCount: number // 已执行次数
   totalInvested: number // 累计投入金额
 }
@@ -71,6 +72,8 @@ export interface UserState {
   lastResetTime: number | null
   equityHistory: EquityRecord[]
   completedCourses: string[]
+  unlockedAchievements: string[]
+  profitableSells: number
 
   addExperience: (exp: number) => void
   addGold: (amount: number) => void
@@ -94,9 +97,13 @@ export interface UserState {
   checkStopLossOrders: (prices: Record<string, number>) => Array<{ order: StopLossOrder; symbol: string; price: number }>
   addAutoInvestPlan: (plan: Omit<AutoInvestPlan, 'id' | 'createTime' | 'status' | 'executedCount' | 'totalInvested' | 'nextExecuteTime'>) => string
   pauseAutoInvestPlan: (planId: string) => void
+  pauseAutoInvestBySymbol: (symbol: string) => void
   resumeAutoInvestPlan: (planId: string) => void
   cancelAutoInvestPlan: (planId: string) => void
   checkAutoInvestPlans: (prices: Record<string, number>) => Array<{ plan: AutoInvestPlan; symbol: string; price: number }>
+  markAutoInvestExecuted: (planId: string) => void
+  unlockAchievement: (id: string, goldReward: number) => boolean
+  incrementProfitableSells: () => void
 }
 
 const INITIAL_STATE = {
@@ -114,12 +121,15 @@ const INITIAL_STATE = {
     { date: new Date().toISOString().split('T')[0], value: 100000 }
   ],
   completedCourses: [],
+  unlockedAchievements: [],
+  profitableSells: 0,
 }
 
 export const useUserStore = create<UserState>()(
   persist(
     (set, get) => ({
       ...INITIAL_STATE,
+
 
       addExperience: (exp: number) => {
         const state = get()
@@ -361,8 +371,19 @@ export const useUserStore = create<UserState>()(
   pauseAutoInvestPlan: (planId) => {
     const state = get()
     set({
-      autoInvestPlans: state.autoInvestPlans.map(p => 
-        p.id === planId ? { ...p, status: 'paused' } : p
+      autoInvestPlans: state.autoInvestPlans.map(p =>
+        p.id === planId ? { ...p, status: 'paused', pauseReason: 'manual' } : p
+      ),
+    })
+  },
+
+  pauseAutoInvestBySymbol: (symbol) => {
+    const state = get()
+    set({
+      autoInvestPlans: state.autoInvestPlans.map(p =>
+        p.symbol === symbol && p.status === 'active'
+          ? { ...p, status: 'paused', pauseReason: 'stop_loss' }
+          : p
       ),
     })
   },
@@ -382,7 +403,7 @@ export const useUserStore = create<UserState>()(
           } else if (p.interval === 'monthly') {
             nextExecuteTime = now + 120000
           }
-          return { ...p, status: 'active', nextExecuteTime }
+          return { ...p, status: 'active', nextExecuteTime, pauseReason: undefined }
         }
         return p
       }),
@@ -398,6 +419,20 @@ export const useUserStore = create<UserState>()(
     })
   },
 
+  unlockAchievement: (id, goldReward) => {
+    const state = get()
+    if (state.unlockedAchievements.includes(id)) return false
+    set(state => ({
+      unlockedAchievements: [...state.unlockedAchievements, id],
+      gold: state.gold + goldReward,
+    }))
+    return true
+  },
+
+  incrementProfitableSells: () => {
+    set(state => ({ profitableSells: state.profitableSells + 1 }))
+  },
+
   checkAutoInvestPlans: (prices) => {
     const state = get()
     const now = Date.now()
@@ -406,40 +441,38 @@ export const useUserStore = create<UserState>()(
     state.autoInvestPlans.forEach(plan => {
       if (plan.status !== 'active') return
       if (now < plan.nextExecuteTime) return
-      
+
       const currentPrice = prices[plan.symbol]
       if (currentPrice === undefined) return
 
       executedPlans.push({ plan, symbol: plan.symbol, price: currentPrice })
     })
 
-    if (executedPlans.length > 0) {
-      set({
-        autoInvestPlans: state.autoInvestPlans.map(p => {
-          const executed = executedPlans.find(e => e.plan.id === p.id)
-          if (!executed) return p
+    return executedPlans
+  },
 
-          // 计算下次执行时间
-          let nextExecuteTime = now
-          if (p.interval === 'daily') {
-            nextExecuteTime = now + 30000
-          } else if (p.interval === 'weekly') {
-            nextExecuteTime = now + 60000
-          } else if (p.interval === 'monthly') {
-            nextExecuteTime = now + 120000
-          }
+  markAutoInvestExecuted: (planId) => {
+    const state = get()
+    const now = Date.now()
+    const plan = state.autoInvestPlans.find(p => p.id === planId)
+    if (!plan) return
 
-          return {
-            ...p,
-            nextExecuteTime,
-            executedCount: p.executedCount + 1,
-            totalInvested: p.totalInvested + p.amount,
-          }
-        }),
-      })
+    let nextExecuteTime = now
+    if (plan.interval === 'daily') {
+      nextExecuteTime = now + 30000
+    } else if (plan.interval === 'weekly') {
+      nextExecuteTime = now + 60000
+    } else if (plan.interval === 'monthly') {
+      nextExecuteTime = now + 120000
     }
 
-    return executedPlans
+    set({
+      autoInvestPlans: state.autoInvestPlans.map(p =>
+        p.id === planId
+          ? { ...p, nextExecuteTime, executedCount: p.executedCount + 1, totalInvested: p.totalInvested + p.amount }
+          : p
+      ),
+    })
   },
 }),
     {

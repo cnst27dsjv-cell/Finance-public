@@ -3,33 +3,36 @@ import { Link } from 'react-router-dom'
 import { useUserStore } from '@/stores/userStore'
 import './Home.css'
 
-const features = [
-  {
-    icon: '📚',
-    title: '学习系统',
-    description: '从零基础开始，阶梯式学习投资知识',
-    path: '/learning',
-    color: '#4ECDC4',
-  },
-  {
-    icon: '📈',
-    title: '投资模拟',
-    description: '模拟真实市场，练习各种投资操作',
-    path: '/simulator',
-    color: '#45B7D1',
-  },
-  {
-    icon: '🔬',
-    title: '量化实验室',
-    description: '编写量化策略，验证投资想法',
-    path: '/quant-lab',
-    color: '#FFD93D',
-    locked: true,
-  },
-]
-
 function Home() {
-  const { level, experience, gold, availableFund, positions } = useUserStore()
+  const { level, experience, gold, availableFund, positions, hasCompletedCourse } = useUserStore()
+
+  // 量化实验室需完成 Level 3 全部课程才解锁
+  const isQuantUnlocked = ['L3-1', 'L3-2', 'L3-3', 'L3-4'].every(id => hasCompletedCourse(id))
+
+  const features = [
+    {
+      icon: '📚',
+      title: '学习系统',
+      description: '从零基础开始，阶梯式学习投资知识',
+      path: '/learning',
+      color: '#8BA3C5',   /* Frost Blue */
+    },
+    {
+      icon: '📈',
+      title: '投资模拟',
+      description: '模拟真实市场，练习各种投资操作',
+      path: '/simulator',
+      color: '#495B7D',   /* Steel */
+    },
+    {
+      icon: '🔬',
+      title: '量化实验室',
+      description: '编写量化策略，验证投资想法',
+      path: '/quant-lab',
+      color: '#23354D',   /* Storm */
+      locked: !isQuantUnlocked,
+    },
+  ]
 
   const expNeeded = level * 100
   const positionsValue = positions.reduce((sum, p) => sum + p.currentPrice * p.quantity, 0)

@@ -1,6 +1,7 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/authStore'
 import './Layout.css'
 
 const navItems = [
@@ -13,7 +14,9 @@ const navItems = [
 
 function Layout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { level, gold, experience, positions } = useUserStore()
+  const { user, isGuest, signOut } = useAuthStore()
 
   const totalPL = positions.reduce((sum, p) => {
     const pl = (p.currentPrice - p.avgCost) * p.quantity
@@ -22,6 +25,15 @@ function Layout() {
 
   const expNeeded = level * 100
   const expPercent = (experience / expNeeded) * 100
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/login')
+  }
+
+  const displayName = isGuest
+    ? '游客'
+    : user?.email?.split('@')[0] ?? '用户'
 
   return (
     <div className="layout">
@@ -51,6 +63,13 @@ function Layout() {
               </Link>
             ))}
           </nav>
+
+          <div className="header-user">
+            <span className="user-name">{isGuest ? '👤 游客' : `👤 ${displayName}`}</span>
+            <button className="signout-btn" onClick={handleSignOut} title="退出登录">
+              退出
+            </button>
+          </div>
         </div>
       </header>
 

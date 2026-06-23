@@ -1,12 +1,11 @@
-.profile {
-  padding: 20px 0;
-}
+.profile { padding: 8px 0 24px; }
 
+/* ===== Header ===== */
 .profile-header {
-  background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
+  background: var(--color-primary-pale);
+  border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-xl);
-  padding: 32px;
-  color: white;
+  padding: 28px 32px;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -16,182 +15,204 @@
 
 .avatar {
   position: relative;
-  width: 80px;
-  height: 80px;
-  background: white;
+  width: 72px;
+  height: 72px;
+  background: #fff;
+  border: 2px solid var(--color-border-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--shadow-md);
+  flex-shrink: 0;
 }
 
-.avatar-icon {
-  font-size: 48px;
-}
+.avatar-icon { font-size: 38px; }
 
 .level-badge {
   position: absolute;
-  bottom: -5px;
-  right: -5px;
+  bottom: -4px;
+  right: -4px;
   background: var(--color-primary);
-  color: #333;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 700;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 800;
+  border: 2px solid #fff;
 }
 
-.user-info {
-  flex: 1;
-}
+.user-info { flex: 1; min-width: 200px; }
 
 .user-info h1 {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 10px;
+  letter-spacing: -0.4px;
 }
 
 .exp-bar-large {
-  height: 12px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
+  height: 7px;
+  background: rgba(212, 148, 10, 0.15);
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
 }
 
 .exp-fill {
   height: 100%;
-  background: var(--color-primary);
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, var(--color-primary-light), var(--color-primary));
+  transition: width 0.4s ease;
+  border-radius: 4px;
 }
 
 .exp-label {
   position: absolute;
   right: 0;
-  top: 16px;
-  font-size: 12px;
-  opacity: 0.8;
+  top: 13px;
+  font-size: 11px;
+  color: var(--color-primary);
+  opacity: 0.7;
 }
 
-.quick-stats {
-  display: flex;
-  gap: 24px;
-}
+.quick-stats { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  min-width: 68px;
+  box-shadow: var(--shadow-sm);
 }
 
-.stat-icon {
-  font-size: 24px;
-}
+.stat-icon { font-size: 16px; }
 
 .stat-value {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
-  font-size: 12px;
-  opacity: 0.8;
+  font-size: 11px;
+  color: var(--color-text-muted);
 }
 
+/* ===== Content Grid ===== */
 .profile-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 18px;
 }
 
 .profile-content section {
   background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 22px;
   box-shadow: var(--shadow-sm);
 }
 
 .profile-content section h2 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 20px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--color-text-primary);
+  letter-spacing: -0.2px;
 }
 
+/* ===== Skills ===== */
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
 }
 
 .skill-card {
-  background: var(--color-bg-secondary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 12px 10px;
   text-align: center;
-  transition: all 0.2s ease;
+  transition: all var(--transition-base);
 }
 
-.skill-card.locked {
-  opacity: 0.5;
+.skill-card:not(.locked):hover {
+  border-color: var(--color-border-secondary);
+  background: var(--color-secondary-pale);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
-.skill-icon {
-  font-size: 32px;
-  margin-bottom: 8px;
-}
+.skill-card.locked { opacity: 0.4; }
+
+.skill-icon { font-size: 26px; margin-bottom: 7px; }
 
 .skill-name {
   display: block;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   margin-bottom: 8px;
+  color: var(--color-text-muted);
 }
 
+.skill-card:not(.locked) .skill-name { color: var(--color-secondary); }
+
 .skill-progress {
-  height: 6px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
+  height: 3px;
+  background: var(--color-bg-secondary);
+  border-radius: 2px;
   overflow: hidden;
 }
 
 .skill-fill {
   height: 100%;
-  background: var(--color-secondary);
+  background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
+  border-radius: 2px;
 }
 
-.achievements-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* ===== Achievements ===== */
+.achievements-grid { display: flex; flex-direction: column; gap: 8px; }
+
+.achievements-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
 }
 
 .achievement-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: var(--color-bg-secondary);
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  transition: all var(--transition-base);
 }
 
-.achievement-card.locked {
-  opacity: 0.5;
+.achievement-card.unlocked {
+  background: var(--color-success-pale);
+  border-color: rgba(26, 158, 108, 0.2);
 }
 
-.achievement-icon {
-  font-size: 36px;
-}
+.achievement-card.locked { opacity: 0.45; }
 
-.achievement-info {
-  flex: 1;
-}
+.achievement-icon { font-size: 26px; }
+.achievement-info { flex: 1; }
 
 .achievement-info h4 {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: var(--color-text-primary);
 }
 
 .achievement-info p {
@@ -200,205 +221,205 @@
 }
 
 .achievement-reward {
-  background: rgba(255, 217, 61, 0.2);
+  background: var(--color-primary-pale);
   color: var(--color-primary);
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 600;
+  border: 1px solid rgba(212, 148, 10, 0.25);
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+.achievement-reward.claimed {
+  background: var(--color-success-pale);
+  color: var(--color-success);
+  border-color: rgba(26, 158, 108, 0.25);
 }
+
+/* ===== Stats ===== */
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 
 .stat-card {
-  background: var(--color-bg-secondary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 14px;
   text-align: center;
 }
 
+
 .stat-card .stat-label {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-text-muted);
-  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 7px;
 }
 
 .stat-card .stat-value {
   font-size: 18px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
 }
 
-.stat-card .stat-value.profit {
-  color: var(--color-danger);
-}
+.stat-card .stat-value.profit { color: var(--color-success); }
+.stat-card .stat-value.loss   { color: var(--color-danger); }
 
-.stat-card .stat-value.loss {
-  color: var(--color-success);
-}
-
-.transactions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.transaction-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-md);
-}
-
-.tx-icon {
-  font-size: 24px;
-}
-
-.tx-info {
-  flex: 1;
-}
-
-.tx-title {
-  display: block;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.tx-meta {
-  display: block;
-  font-size: 12px;
-  color: var(--color-text-muted);
-}
-
-.tx-type-badge {
-  padding: 4px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.tx-type-badge:contains('买入') {
-  background: rgba(255, 107, 107, 0.2);
-  color: var(--color-danger);
-}
-
-.no-transactions {
-  text-align: center;
-  padding: 32px;
-  color: var(--color-text-muted);
-}
-
-@media (max-width: 768px) {
-  .profile-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .quick-stats {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .profile-content {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* ===== Account Management ===== */
 .account-section {
   background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 22px;
   box-shadow: var(--shadow-sm);
 }
 
 .account-section h2 {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
 }
 
 .account-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
 }
 
 .action-card {
-  background: var(--color-bg-secondary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 18px;
   text-align: center;
 }
 
 .action-card h4 {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   color: var(--color-text-primary);
 }
 
 .action-card p {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--color-text-secondary);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .exchange-rate {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--color-primary);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .cooldown-text {
-  font-size: 14px;
-  color: var(--color-text-tertiary);
-  margin-bottom: 16px;
-  min-height: 20px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+  min-height: 18px;
 }
 
 .exchange-btn,
 .reset-btn {
   width: 100%;
-  padding: 12px 24px;
+  padding: 10px 24px;
   border: none;
   border-radius: var(--radius-md);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-base);
 }
 
 .exchange-btn {
   background: var(--color-primary);
-  color: #333;
+  color: #fff;
 }
 
 .exchange-btn:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  background: var(--color-primary-light);
+  box-shadow: var(--shadow-glow-primary);
+  transform: translateY(-1px);
 }
 
 .reset-btn {
-  background: #ff6b6b;
-  color: white;
+  background: var(--color-danger-pale);
+  color: var(--color-danger);
+  border: 1px solid rgba(217, 79, 79, 0.25);
 }
 
 .reset-btn:hover:not(:disabled) {
-  background: #ff5252;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  background: #fce0e0;
+  transform: translateY(-1px);
 }
 
 .exchange-btn:disabled,
 .reset-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
   transform: none !important;
   box-shadow: none !important;
+}
+
+/* ===== Transactions ===== */
+.transactions-list { display: flex; flex-direction: column; gap: 7px; }
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 13px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.transaction-item:hover {
+  border-color: var(--color-border-bright);
+  box-shadow: var(--shadow-sm);
+}
+
+.tx-icon { font-size: 17px; }
+.tx-info { flex: 1; }
+
+.tx-title {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.tx-meta {
+  display: block;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tx-type-badge {
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.no-transactions {
+  text-align: center;
+  padding: 28px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .profile-header { flex-direction: column; text-align: center; padding: 20px; }
+  .quick-stats { width: 100%; justify-content: center; }
+  .profile-content { grid-template-columns: 1fr; }
 }

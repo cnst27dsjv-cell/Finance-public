@@ -1,23 +1,33 @@
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useUserStore } from '@/stores/userStore'
 import './Profile.css'
 
-const ACHIEVEMENTS = [
-  {
-    id: 'first_profit',
-    name: '初次盈利',
-    description: '完成第一笔盈利交易',
-    icon: '💰',
-    reward: 100,
-    unlocked: false,
-  },
+interface AchievementDef {
+  id: string
+  name: string
+  description: string
+  icon: string
+  reward: number
+  condition: (state: ReturnType<typeof useUserStore.getState>) => boolean
+}
+
+const ACHIEVEMENT_DEFS: AchievementDef[] = [
   {
     id: 'first_trade',
     name: '初入市场',
     description: '完成第一笔交易',
     icon: '📈',
     reward: 50,
-    unlocked: false,
+    condition: s => s.transactions.length > 0,
+  },
+  {
+    id: 'first_profit',
+    name: '初次盈利',
+    description: '完成第一笔盈利交易',
+    icon: '💰',
+    reward: 100,
+    condition: s => s.profitableSells > 0,
   },
   {
     id: 'learning_1',
@@ -25,7 +35,7 @@ const ACHIEVEMENTS = [
     description: '完成第一章学习',
     icon: '📚',
     reward: 200,
-    unlocked: false,
+    condition: s => s.completedCourses.includes('L1-1'),
   },
   {
     id: 'diversified',
@@ -33,7 +43,7 @@ const ACHIEVEMENTS = [
     description: '同时持有3种以上资产',
     icon: '🎯',
     reward: 150,
-    unlocked: false,
+    condition: s => s.positions.length >= 3,
   },
   {
     id: 'profit_10',
@@ -41,7 +51,10 @@ const ACHIEVEMENTS = [
     description: '累计收益超过10%',
     icon: '🌟',
     reward: 300,
-    unlocked: false,
+    condition: s => {
+      const posVal = s.positions.reduce((sum, p) => sum + p.currentPrice * p.quantity, 0)
+      return ((s.availableFund + posVal - 100000) / 100000) * 100 >= 10
+    },
   },
   {
     id: 'profit_20',
@@ -49,38 +62,60 @@ const ACHIEVEMENTS = [
     description: '累计收益超过20%',
     icon: '⭐',
     reward: 500,
-    unlocked: false,
+    condition: s => {
+      const posVal = s.positions.reduce((sum, p) => sum + p.currentPrice * p.quantity, 0)
+      return ((s.availableFund + posVal - 100000) / 100000) * 100 >= 20
+    },
   },
 ]
 
-const SKILLS = [
-  { id: 'savings', name: '储蓄入门', level: 1, maxLevel: 1, unlocked: true },
-  { id: 'fund', name: '基金基础', level: 0, maxLevel: 1, unlocked: false },
-  { id: 'stock', name: '股票入门', level: 0, maxLevel: 1, unlocked: false },
-  { id: 'bond', name: '债券基础', level: 0, maxLevel: 1, unlocked: false },
-  { id: 'tech', name: '技术分析', level: 0, maxLevel: 1, unlocked: false },
-  { id: 'quant', name: '量化入门', level: 0, maxLevel: 1, unlocked: false },
+interface SkillDef {
+  id: string
+  name: string
+  condition: (hasCompleted: (id: string) => boolean) => boolean
+}
+
+const SKILL_DEFS: SkillDef[] = [
+  { id: 'savings', name: '储蓄入门', condition: h => h('L1-1') },
+  { id: 'bond', name: '债券基础', condition: h => h('L1-3') },
+  { id: 'fund', name: '基金基础', condition: h => ['L2-1', 'L2-2', 'L2-3', 'L2-4'].every(id => h(id)) },
+  { id: 'stock', name: '股票入门', condition: h => ['L3-1', 'L3-2', 'L3-3', 'L3-4'].every(id => h(id)) },
+  { id: 'tech', name: '技术分析', condition: h => h('L3-3') },
+  { id: 'quant', name: '量化入门', condition: h => h('L4-3') },
 ]
 
 function Profile() {
-  const { 
-    level, 
-    experience, 
-    gold, 
+  const {
+    level,
+    experience,
+    gold,
     transactions,
     availableFund,
     positions,
+    unlockedAchievements,
+    unlockAchievement,
+    hasCompletedCourse,
     reset,
     canReset,
     addFund,
     spendGold,
-    lastResetTime
+    lastResetTime,
   } = useUserStore()
 
   const expNeeded = level * 100
   const positionsValue = positions.reduce((sum, p) => sum + p.currentPrice * p.quantity, 0)
   const totalAsset = availableFund + positionsValue
   const profitRate = ((totalAsset - 100000) / 100000) * 100
+
+  // 自动解锁成就并发放奖励
+  useEffect(() => {
+    const state = useUserStore.getState()
+    ACHIEVEMENT_DEFS.forEach(def => {
+      if (!state.unlockedAchievements.includes(def.id) && def.condition(state)) {
+        unlockAchievement(def.id, def.reward)
+      }
+    })
+  })
 
   const getCooldownText = () => {
     if (!lastResetTime || canReset()) return ''
@@ -147,51 +182,58 @@ function Profile() {
         <section className="skills-section">
           <h2>🎯 技能树</h2>
           <div className="skills-grid">
-            {SKILLS.map((skill, index) => (
-              <motion.div
-                key={skill.id}
-                className={`skill-card ${skill.unlocked ? '' : 'locked'}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <div className="skill-icon">
-                  {skill.unlocked ? '✓' : '🔒'}
-                </div>
-                <span className="skill-name">{skill.name}</span>
-                <div className="skill-progress">
-                  <div
-                    className="skill-fill"
-                    style={{ width: `${(skill.level / skill.maxLevel) * 100}%` }}
-                  />
-                </div>
-              </motion.div>
-            ))}
+            {SKILL_DEFS.map((skill, index) => {
+              const unlocked = skill.condition(hasCompletedCourse)
+              return (
+                <motion.div
+                  key={skill.id}
+                  className={`skill-card ${unlocked ? '' : 'locked'}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div className="skill-icon">
+                    {unlocked ? '✓' : '🔒'}
+                  </div>
+                  <span className="skill-name">{skill.name}</span>
+                  <div className="skill-progress">
+                    <div
+                      className="skill-fill"
+                      style={{ width: unlocked ? '100%' : '0%' }}
+                    />
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
         </section>
 
         <section className="achievements-section">
           <h2>🏆 成就</h2>
+          <p className="achievements-hint">达成条件后自动解锁并获得金币奖励</p>
           <div className="achievements-grid">
-            {ACHIEVEMENTS.map((achievement, index) => (
-              <motion.div
-                key={achievement.id}
-                className={`achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={achievement.unlocked ? { scale: 1.05 } : {}}
-              >
-                <div className="achievement-icon">{achievement.icon}</div>
-                <div className="achievement-info">
-                  <h4>{achievement.name}</h4>
-                  <p>{achievement.description}</p>
-                </div>
-                <div className="achievement-reward">
-                  +{achievement.reward} 🪙
-                </div>
-              </motion.div>
-            ))}
+            {ACHIEVEMENT_DEFS.map((achievement, index) => {
+              const isUnlocked = unlockedAchievements.includes(achievement.id)
+              return (
+                <motion.div
+                  key={achievement.id}
+                  className={`achievement-card ${isUnlocked ? 'unlocked' : 'locked'}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={isUnlocked ? { scale: 1.05 } : {}}
+                >
+                  <div className="achievement-icon">{achievement.icon}</div>
+                  <div className="achievement-info">
+                    <h4>{achievement.name}</h4>
+                    <p>{achievement.description}</p>
+                  </div>
+                  <div className={`achievement-reward ${isUnlocked ? 'claimed' : ''}`}>
+                    {isUnlocked ? '✓ 已获得' : `+${achievement.reward} 🪙`}
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
         </section>
 
@@ -230,7 +272,7 @@ function Profile() {
               <div className="exchange-rate">
                 <span>100 🪙 = ¥10,000</span>
               </div>
-              <button 
+              <button
                 className="exchange-btn"
                 onClick={handleExchange}
                 disabled={gold < 100}
@@ -242,7 +284,7 @@ function Profile() {
               <h4>重置账户</h4>
               <p>重新开始，资金回到10万</p>
               <div className="cooldown-text">{getCooldownText()}</div>
-              <button 
+              <button
                 className="reset-btn"
                 onClick={reset}
                 disabled={!canReset()}

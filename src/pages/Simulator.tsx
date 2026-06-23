@@ -19,7 +19,7 @@ function Simulator() {
   const [stopLossPositionId, setStopLossPositionId] = useState<string | null>(null)
   const [showAutoInvestModal, setShowAutoInvestModal] = useState(false)
   const [autoInvestAsset, setAutoInvestAsset] = useState<any>(null)
-  const [autoInvestAmount, setAutoInvestAmount] = useState(1000)
+  const [autoInvestAmount, setAutoInvestAmount] = useState(1)
   const [autoInvestInterval, setAutoInvestInterval] = useState<'daily' | 'weekly' | 'monthly'>('weekly')
   const [currentTime, setCurrentTime] = useState(Date.now())
 
@@ -43,9 +43,12 @@ function Simulator() {
     checkStopLossOrders,
     addAutoInvestPlan,
     pauseAutoInvestPlan,
+    pauseAutoInvestBySymbol,
     resumeAutoInvestPlan,
     cancelAutoInvestPlan,
     checkAutoInvestPlans,
+    markAutoInvestExecuted,
+    incrementProfitableSells,
   } = useUserStore()
 
   const { 
@@ -124,34 +127,32 @@ function Simulator() {
             quantity: sellQuantity,
             commission,
           })
+          // 止损触发后暂停该股票的所有定投计划
+          pauseAutoInvestBySymbol(symbol)
         }
       })
 
       // 检查定投计划
       const executedPlans = checkAutoInvestPlans(priceMap)
       executedPlans.forEach(({ plan, symbol, price }) => {
-        // 检查资金是否足够
-        if (availableFund < plan.amount) return
-
-        // 计算可以买多少（按手计算，每手100股）
-        const quantityPerHand = 100
-        const totalCost = plan.amount
-        const maxQuantity = Math.floor(totalCost / (price * quantityPerHand)) * quantityPerHand
-        
-        if (maxQuantity <= 0) return
-
+        // plan.amount 单位：手，每手100股
+        const maxQuantity = plan.amount * 100
         const commission = price * maxQuantity * 0.0003
         const actualCost = price * maxQuantity + commission
 
         if (actualCost > availableFund) return
 
         // 执行定投买入
-        withdrawFund(actualCost)
+        const success = withdrawFund(actualCost)
+        if (!success) return
 
-        const existingPosition = positions.find(p => p.symbol === symbol)
+        // 标记计划已执行（只在买入成功后才更新）
+        markAutoInvestExecuted(plan.id)
+
+        const existingPosition = useUserStore.getState().positions.find(p => p.symbol === symbol)
         if (existingPosition) {
           const newQuantity = existingPosition.quantity + maxQuantity
-          const newAvgCost = 
+          const newAvgCost =
             (existingPosition.avgCost * existingPosition.quantity + price * maxQuantity) / newQuantity
 
           updatePosition({
@@ -170,7 +171,7 @@ function Simulator() {
             currentPrice: price,
             buyDate: Date.now(),
             canSell: true,
-            assetType: 'stock' as const, // 默认股票类型
+            assetType: 'stock' as const,
           })
         }
 
@@ -188,7 +189,7 @@ function Simulator() {
     }, 3000)
 
     return () => clearInterval(interval)
-  }, [assets, marketUpdatePrices, updatePrices, recordEquity, checkStopLossOrders, positions, removePosition, updatePosition, addFund, addTransaction, checkAutoInvestPlans, availableFund, withdrawFund])
+  }, [assets, marketUpdatePrices, updatePrices, recordEquity, checkStopLossOrders, positions, removePosition, updatePosition, addFund, addTransaction, checkAutoInvestPlans, markAutoInvestExecuted, availableFund, withdrawFund, pauseAutoInvestBySymbol])
 
   useEffect(() => {
     const newsInterval = setInterval(() => {
@@ -348,6 +349,7 @@ function Simulator() {
       if (profit > 0) {
         addExperience(Math.floor(profit / 10))
         addGold(Math.floor(profit / 5))
+        incrementProfitableSells()
       }
     }
 
@@ -368,6 +370,7 @@ function Simulator() {
     addGold,
     addFund,
     withdrawFund,
+    incrementProfitableSells,
   ])
 
   // 止损单相关函数
@@ -464,7 +467,7 @@ function Simulator() {
   // 定投相关函数
   const handleOpenAutoInvestModal = useCallback((asset: any) => {
     setAutoInvestAsset(asset)
-    setAutoInvestAmount(1000)
+    setAutoInvestAmount(1)
     setAutoInvestInterval('weekly')
     setShowAutoInvestModal(true)
   }, [])
@@ -1272,12 +1275,15 @@ function Simulator() {
                       <div className="auto-invest-info">
                         <span className="auto-invest-name">{plan.name}</span>
                         <span className="auto-invest-details">
-                          {intervalText}投 ¥{plan.amount} · 已投{plan.executedCount}次 · 累计¥{plan.totalInvested}
+                          {intervalText}投 {plan.amount}手 · 已投{plan.executedCount}次 · 累计{plan.totalInvested}手
                         </span>
                         {plan.status === 'active' && (
                           <span className="auto-invest-countdown">
                             下次: {countdown}秒
                           </span>
+                        )}
+                        {plan.status === 'paused' && plan.pauseReason === 'stop_loss' && (
+                          <span className="auto-invest-stoploss-tag">🛡️ 止损已触发，定投已暂停</span>
                         )}
                       </div>
                       <div className="auto-invest-actions">
@@ -1442,14 +1448,14 @@ function Simulator() {
                   </>
                 )}
                 <div className="auto-invest-input-group">
-                  <label>每次定投金额:</label>
+                  <label>每次定投数量（手，1手=100股）:</label>
                   <input
                     type="number"
                     value={autoInvestAmount}
-                    onChange={(e) => setAutoInvestAmount(Math.max(100, parseInt(e.target.value) || 0))}
-                    step="100"
-                    min="100"
-                    placeholder="输入定投金额"
+                    onChange={(e) => setAutoInvestAmount(Math.max(1, parseInt(e.target.value) || 1))}
+                    step="1"
+                    min="1"
+                    placeholder="输入定投手数"
                   />
                 </div>
                 <div className="auto-invest-interval-group">

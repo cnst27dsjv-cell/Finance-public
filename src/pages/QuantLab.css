@@ -29,7 +29,7 @@
 }
 
 .workflow-section {
-  background: white;
+  background: var(--color-bg-card);
   padding: 28px;
   border-radius: 16px;
   border: 1px solid var(--color-border);
@@ -99,7 +99,7 @@
 }
 
 .example-strategy {
-  background: white;
+  background: var(--color-bg-card);
   padding: 28px;
   border-radius: 16px;
   border: 1px solid var(--color-border);
@@ -189,7 +189,7 @@
 }
 
 .quick-card {
-  background: white;
+  background: var(--color-bg-card);
   padding: 24px;
   border-radius: 12px;
   width: 280px;
@@ -248,7 +248,7 @@
 
 /* 图表区域样式 */
 .chart-section {
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
@@ -293,7 +293,7 @@
 
 /* 额外统计信息 */
 .additional-stats {
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
@@ -343,7 +343,7 @@
 .category-btn {
   padding: 8px 16px;
   border: 1px solid var(--color-border);
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
@@ -480,7 +480,7 @@
 
 .optimization-select,
 .compare-select {
-  background: white;
+  background: var(--color-bg-card);
   padding: 25px;
   border-radius: 12px;
   margin-bottom: 25px;
@@ -559,7 +559,7 @@
 }
 
 .parameter-scan {
-  background: white;
+  background: var(--color-bg-card);
   padding: 25px;
   border-radius: 12px;
   margin-bottom: 25px;
@@ -638,7 +638,7 @@
 
 .optimization-results,
 .compare-results {
-  background: white;
+  background: var(--color-bg-card);
   padding: 25px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -926,7 +926,7 @@
 }
 
 .strategy-card {
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
   border-radius: 12px;
   border: 1px solid var(--color-border);
@@ -1060,7 +1060,7 @@
 }
 
 .deactivate-btn:hover {
-  background: #f39c12;
+  background: var(--color-primary);
   color: white;
 }
 
@@ -1133,7 +1133,7 @@
   font-family: 'Courier New', monospace;
   font-size: 0.95rem;
   resize: vertical;
-  background: #f8f9fa;
+  background: var(--color-bg-secondary);
   margin-bottom: 16px;
 }
 
@@ -1199,7 +1199,7 @@
 }
 
 .backtest-params-section {
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
   border: 1px solid var(--color-border);
   padding: 24px;
@@ -1355,7 +1355,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 12px;
   border: 1px solid var(--color-border);
 }
@@ -1391,7 +1391,7 @@
 }
 
 .backtest-result {
-  background: white;
+  background: var(--color-bg-card);
   padding: 24px;
   border-radius: 12px;
 }
@@ -1474,7 +1474,7 @@
 }
 
 .indicator-card {
-  background: white;
+  background: var(--color-bg-card);
   padding: 20px;
   border-radius: 12px;
   border: 1px solid var(--color-border);
@@ -1560,7 +1560,7 @@
 .unlock-requirements {
   margin: 40px 0;
   text-align: left;
-  background: white;
+  background: var(--color-bg-card);
   padding: 24px;
   border-radius: 12px;
 }
@@ -1600,7 +1600,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: white;
+  background: var(--color-bg-card);
   padding: 16px;
   border-radius: 12px;
 }
