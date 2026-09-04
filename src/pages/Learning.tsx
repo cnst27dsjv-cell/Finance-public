@@ -1218,7 +1218,10 @@ function Learning() {
                 aria-label="储蓄与复利课程视频"
                 onError={() => setVideoLoadError(true)}
               >
-                <source src="/videos/lessons/L1.mp4" type="video/mp4" />
+                <source
+                  src="https://pub-3f213747c6ce4f89902e26c8aabe8e86.r2.dev/lessons/L1.mp4"
+                  type="video/mp4"
+                />
                 您的浏览器暂不支持视频播放。
               </video>
             </div>
