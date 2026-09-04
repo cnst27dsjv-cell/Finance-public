@@ -4,10 +4,10 @@ import { useUserStore } from '@/stores/userStore'
 import './Home.css'
 
 function Home() {
-  const { level, experience, gold, availableFund, positions, hasCompletedCourse } = useUserStore()
+  const { level, experience, gold, availableFund, positions } = useUserStore()
 
-  // 量化实验室需完成 Level 3 全部课程才解锁
-  const isQuantUnlocked = ['L3-1', 'L3-2', 'L3-3', 'L3-4'].every(id => hasCompletedCourse(id))
+  // TODO: 本地调试用，临时强制解锁
+  const isQuantUnlocked = true // ['L3-1', 'L3-2', 'L3-3', 'L3-4'].every(id => hasCompletedCourse(id))
 
   const features = [
     {

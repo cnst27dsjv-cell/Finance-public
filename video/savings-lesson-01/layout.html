@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>第一课 · 画面布局编辑器</title>
+    <link rel="stylesheet" href="layout-editor/course-editor.css?v=layout-2">
+  </head>
+  <body>
+    <main class="app">
+      <aside class="sidebar">
+        <p class="eyebrow">INVEST QUEST · L1 01</p>
+        <h1>课程画面布局编辑器</h1>
+        <p class="intro">逐页调整基础构图。文字框可左右拉宽，曲线可拖端点与控制点。动画仍由视频时间轴负责。</p>
+        <nav id="scene-tabs" class="scene-tabs" aria-label="选择场景"></nav>
+        <div class="toolbar">
+          <button id="undo" type="button">撤销</button>
+          <button id="redo" type="button">重做</button>
+          <button id="preview" type="button">隐藏控制框</button>
+          <button id="reset-scene" type="button">重置本页</button>
+          <button id="reset-all" type="button">全部重置</button>
+          <button id="clear-draft" type="button">清除草稿</button>
+          <button id="deselect" class="wide" type="button">取消选择</button>
+        </div>
+        <div class="layer-head"><strong>本页图层</strong><span id="layer-count">0 个</span></div>
+        <input id="layer-search" type="search" placeholder="搜索标题、图表、线条或编号">
+        <div id="layer-list" class="layer-list"></div>
+        <div class="file-row">
+          <button id="import-json" type="button">导入 JSON</button>
+          <button id="export-json" type="button">下载 JSON</button>
+        </div>
+        <input id="json-file" type="file" accept="application/json,.json" hidden>
+        <div id="status" class="status" role="status">正在载入课程画面……</div>
+      </aside>
+      <section class="workspace">
+        <div class="workspace-top">
+          <span id="scene-readout">S01 · 场景布局</span>
+          <span>蓝色左右手柄 拉宽文字　<kbd>方向键</kbd> 微移　<kbd>[ ]</kbd> 旋转　<kbd>− +</kbd> 缩放</span>
+        </div>
+        <div id="canvas-area" class="canvas-area">
+          <div id="stage-shell" class="stage-shell">
+            <div id="stage-scale" class="stage-scale">
+              <iframe id="preview-frame" title="课程场景预览" src="index.html?layoutEdit=1&amp;scene=s01"></iframe>
+              <div id="overlay" class="overlay" aria-label="布局控制层"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="layout-editor/course-editor.mjs?v=layout-2"></script>
+  </body>
+</html>

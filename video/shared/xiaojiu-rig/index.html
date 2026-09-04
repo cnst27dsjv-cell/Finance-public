@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>小啾老师 · 骨骼动作资产</title>
+    <script src="./vendor/gsap.min.js"></script>
+    <link rel="stylesheet" href="xiaojiu-rig.css?v=1.2.0">
+    <style>
+      @font-face { font-family: "Finance Sans"; src: local("PingFang SC"); }
+      @font-face { font-family: "Finance Hand"; src: local("Kaiti SC"); }
+      @font-face { font-family: "Microsoft YaHei"; src: local("Microsoft YaHei"); }
+      @font-face { font-family: "Kaiti SC"; src: local("Kaiti SC"); }
+      :root { --ink: #1d2a45; --gold: #e7b83f; --green: #2da474; --paper: #faf7ef; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }
+      body { font-family: "Finance Sans", "Microsoft YaHei", sans-serif; color: var(--ink); background: var(--paper); }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+      .clip { position: absolute; inset: 0; overflow: hidden; }
+      .backdrop { position: absolute; inset: 0; opacity: 0; visibility: hidden; }
+      #paper-bg {
+        background:
+          radial-gradient(circle at 19% 28%, rgba(231,184,63,.22), transparent 25%),
+          radial-gradient(circle at 78% 68%, rgba(79,155,185,.15), transparent 28%),
+          #faf7ef;
+      }
+      #blue-bg { background: linear-gradient(135deg, #d7edf0 0%, #accfd9 58%, #85b8c7 100%); }
+      #dark-bg { background: linear-gradient(135deg, #17233c 0%, #20395b 55%, #102033 100%); }
+      .paper-grid {
+        position: absolute; inset: 0; opacity: .28; pointer-events: none;
+        background-image: radial-gradient(circle, rgba(29,42,69,.2) 0 1.2px, transparent 1.5px);
+        background-size: 32px 32px;
+      }
+      .frame { position: absolute; inset: 28px; border: 3px solid rgba(29,42,69,.22); }
+      .chrome { position: absolute; left: 78px; right: 78px; top: 52px; display: flex; align-items: center; justify-content: space-between; z-index: 20; }
+      .brand { font-size: 24px; font-weight: 900; letter-spacing: .18em; }
+      .asset-tag { padding: 12px 22px; border: 3px solid currentColor; font-size: 22px; font-weight: 900; letter-spacing: .08em; background: rgba(255,255,255,.36); }
+      .copy { position: absolute; left: 98px; top: 205px; width: 760px; z-index: 12; }
+      .eyebrow { display: flex; align-items: center; gap: 14px; font-size: 25px; font-weight: 900; letter-spacing: .14em; color: #47718c; }
+      .eyebrow::before { content: ""; width: 58px; height: 8px; background: var(--gold); border-radius: 99px; }
+      h1 { margin: 28px 0 18px; font-family: "Finance Hand", "Kaiti SC", serif; font-size: 100px; line-height: 1.02; letter-spacing: .03em; }
+      .sub { width: 650px; font-size: 28px; line-height: 1.65; font-weight: 650; color: #52627d; }
+      .action-card { position: absolute; left: 95px; top: 610px; width: 680px; height: 220px; padding: 24px 32px; border: 4px solid currentColor; background: rgba(255,255,255,.72); box-shadow: 12px 12px 0 rgba(29,42,69,.13); transform: rotate(-1deg); z-index: 13; }
+      .action-index { height: 28px; font-size: 18px; line-height: 28px; font-weight: 900; letter-spacing: .16em; color: #637088; }
+      .action-name { height: 70px; margin-top: 5px; font-family: "Finance Hand", "Kaiti SC", serif; font-size: 58px; font-weight: 900; line-height: 70px; }
+      .action-use { height: 34px; margin-top: 5px; font-size: 22px; line-height: 34px; font-weight: 750; color: #52627d; }
+      .action-copy { position: absolute; inset: 22px 30px; opacity: 0; visibility: hidden; }
+      .rig-stage { position: absolute; right: 170px; top: 198px; width: 780px; height: 680px; z-index: 10; }
+      .rig-stage::before { content: ""; position: absolute; left: 50px; top: 40px; width: 640px; height: 570px; border: 4px dashed rgba(29,42,69,.18); border-radius: 48% 52% 44% 56%; transform: rotate(3deg); }
+      #xiaojiu-demo { position: absolute; left: 92px; top: 28px; }
+      .motion-mark { position: absolute; border: 7px solid var(--gold); border-left: 0; border-bottom: 0; border-radius: 50%; opacity: .55; }
+      .motion-mark.one { width: 100px; height: 80px; left: 60px; top: 135px; transform: rotate(-22deg); }
+      .motion-mark.two { width: 76px; height: 58px; right: 56px; bottom: 120px; transform: rotate(146deg); }
+      .chips { position: absolute; left: 88px; right: 88px; bottom: 78px; height: 88px; display: grid; grid-template-columns: repeat(8, 1fr); gap: 13px; z-index: 20; }
+      .chip { display: flex; align-items: center; justify-content: center; border: 3px solid rgba(29,42,69,.28); background: rgba(255,255,255,.42); font-size: 21px; font-weight: 900; letter-spacing: .06em; }
+      .chip::before { content: ""; width: 9px; height: 9px; margin-right: 10px; border-radius: 50%; background: currentColor; opacity: .25; }
+      .progress { position: absolute; left: 0; bottom: 0; width: 100%; height: 14px; background: rgba(29,42,69,.12); z-index: 30; transform-origin: left; }
+      .progress-fill { width: 100%; height: 100%; background: linear-gradient(90deg, var(--gold), var(--green)); transform-origin: left; }
+      .dark-mode { color: #f8f3e8; }
+      .dark-mode .sub, .dark-mode .action-use, .dark-mode .action-index { color: #c5d5e2; }
+      .dark-mode .action-card { background: rgba(22,34,58,.76); }
+      .dark-mode .chip { border-color: rgba(248,243,232,.32); background: rgba(255,255,255,.08); }
+      .dark-mode .rig-stage::before, .dark-mode .frame { border-color: rgba(248,243,232,.22); }
+    </style>
+  </head>
+  <body>
+    <main data-hf-id="xjd-root" id="root" data-composition-id="xiaojiu-rig-demo" data-width="1920" data-height="1080">
+      <section data-hf-id="xjd-stage" id="stage" class="clip" data-start="0" data-duration="32" data-track-index="0">
+        <div data-hf-id="xjd-paperbg" id="paper-bg" class="backdrop"></div>
+        <div data-hf-id="xjd-bluebg" id="blue-bg" class="backdrop"></div>
+        <div data-hf-id="xjd-darkbg" id="dark-bg" class="backdrop"></div>
+        <div data-hf-id="xjd-grid" class="paper-grid"></div>
+        <div data-hf-id="xjd-frame" class="frame"></div>
+        <header data-hf-id="xjd-chrome" class="chrome">
+          <span data-hf-id="xjd-brand" class="brand">INVEST QUEST · 金融小啾课堂</span>
+          <span data-hf-id="xjd-tag" class="asset-tag">2D CUTOUT RIG · v1</span>
+        </header>
+        <div data-hf-id="xjd-copy" class="copy">
+          <div data-hf-id="xjd-eyebrow" class="eyebrow">可复用角色动作资产</div>
+          <h1 data-hf-id="xjd-title">让小啾老师<br data-hf-id="hf-x5px">真正“活”起来</h1>
+          <p data-hf-id="xjd-sub" class="sub">身体、翅膀、表情和配件分别运动。所有动作都能按时间精确定位，后续课程可直接调用。</p>
+        </div>
+        <div data-hf-id="xjd-actioncard" class="action-card">
+          <div data-hf-id="xjd-idle" id="action-idle" class="action-copy"><div data-hf-id="xjd-idleindex" class="action-index">01 / 08 · BASE LOOP</div><div data-hf-id="xjd-idlename" class="action-name">呼吸待机</div><div data-hf-id="xjd-idleuse" class="action-use">避免角色像一张静止贴纸</div></div>
+          <div data-hf-id="xjd-blink" id="action-blink" class="action-copy"><div data-hf-id="xjd-blinkindex" class="action-index">02 / 08 · FACE</div><div data-hf-id="xjd-blinkname" class="action-name">眨眼</div><div data-hf-id="xjd-blinkuse" class="action-use">停顿与转场时保持生命感</div></div>
+          <div data-hf-id="xjd-talk" id="action-talk" class="action-copy"><div data-hf-id="xjd-talkindex" class="action-index">03 / 08 · FACE</div><div data-hf-id="xjd-talkname" class="action-name">讲解口型</div><div data-hf-id="xjd-talkuse" class="action-use">后续可根据剪映旁白节奏对齐</div></div>
+          <div data-hf-id="xjd-teach" id="action-teach" class="action-copy"><div data-hf-id="xjd-teachindex" class="action-index">04 / 08 · GESTURE</div><div data-hf-id="xjd-teachname" class="action-name">指示讲解</div><div data-hf-id="xjd-teachuse" class="action-use">适合公式、图表和重点词</div></div>
+          <div data-hf-id="xjd-think" id="action-think" class="action-copy"><div data-hf-id="xjd-thinkindex" class="action-index">05 / 08 · GESTURE</div><div data-hf-id="xjd-thinkname" class="action-name">思考</div><div data-hf-id="xjd-thinkuse" class="action-use">用于提问、留白和判断题</div></div>
+          <div data-hf-id="xjd-surprise" id="action-surprise" class="action-copy"><div data-hf-id="xjd-surpriseindex" class="action-index">06 / 08 · EMPHASIS</div><div data-hf-id="xjd-surprisename" class="action-name">惊讶强调</div><div data-hf-id="xjd-surpriseuse" class="action-use">突出反常识信息或风险提示</div></div>
+          <div data-hf-id="xjd-nod" id="action-nod" class="action-copy"><div data-hf-id="xjd-nodindex" class="action-index">07 / 08 · RESPONSE</div><div data-hf-id="xjd-nodname" class="action-name">点头确认</div><div data-hf-id="xjd-noduse" class="action-use">用于结论、答案和步骤完成</div></div>
+          <div data-hf-id="xjd-wave" id="action-wave" class="action-copy"><div data-hf-id="xjd-waveindex" class="action-index">08 / 08 · TRANSITION</div><div data-hf-id="xjd-wavename" class="action-name">挥手</div><div data-hf-id="xjd-waveuse" class="action-use">用于开场、收尾和课程衔接</div></div>
+        </div>
+        <div data-hf-id="xjd-rigstage" class="rig-stage">
+          <i data-hf-id="xjd-mark1" class="motion-mark one"></i>
+          <i data-hf-id="xjd-mark2" class="motion-mark two"></i>
+          <div data-hf-id="hf-tf4c" id="xiaojiu-demo"></div>
+        </div>
+        <nav data-hf-id="xjd-chips" class="chips">
+          <span data-hf-id="xjd-chipidle" class="chip" data-action-chip="idle">呼吸</span>
+          <span data-hf-id="xjd-chipblink" class="chip" data-action-chip="blink">眨眼</span>
+          <span data-hf-id="xjd-chiptalk" class="chip" data-action-chip="talk">讲解</span>
+          <span data-hf-id="xjd-chipteach" class="chip" data-action-chip="teach">指示</span>
+          <span data-hf-id="xjd-chipthink" class="chip" data-action-chip="think">思考</span>
+          <span data-hf-id="xjd-chipsurprise" class="chip" data-action-chip="surprise">惊讶</span>
+          <span data-hf-id="xjd-chipnod" class="chip" data-action-chip="nod">点头</span>
+          <span data-hf-id="xjd-chipwave" class="chip" data-action-chip="wave">挥手</span>
+        </nav>
+        <div data-hf-id="xjd-progress" class="progress"><div data-hf-id="xjd-progressfill" class="progress-fill"></div></div>
+      </section>
+    </main>
+    <script src="xiaojiu-rig.js?v=1.2.0"></script>
+    <script>
+      (async () => {
+      const assemblyPreset = await XiaojiuRig.loadAssemblyPreset("assets/xiaojiu-assembly-preset.json");
+      const rig = XiaojiuRig.mount(document.querySelector("#xiaojiu-demo"), {
+        assetBase: "assets/parts/",
+        idPrefix: "xjd-rig",
+        assemblyPreset
+      });
+      gsap.set("[data-hf-id=\"xjd-rigstage\"]", { x: -3, y: 2 });
+      gsap.set("[data-hf-id=\"xjd-rigstage\"]", { x: 82, y: 69 });
+      const timeline = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
+      const actions = ["idle", "blink", "talk", "teach", "think", "surprise", "nod", "wave"];
+
+      timeline.set("#paper-bg", { autoAlpha: 1 }, 0);
+      timeline.set(["#blue-bg", "#dark-bg"], { autoAlpha: 0 }, 0);
+      timeline.fromTo(".progress-fill", { scaleX: 0 }, { scaleX: 1, duration: 32, ease: "none", immediateRender: false }, 0);
+      timeline.fromTo("#xiaojiu-demo", { autoAlpha: 0, x: 110, y: 20, rotation: 4 }, { autoAlpha: 1, x: 0, y: 0, rotation: 0, duration: 0.8, ease: "back.out(1.4)", immediateRender: false }, 0.1);
+      timeline.fromTo(".copy", { autoAlpha: 0, x: -44 }, { autoAlpha: 1, x: 0, duration: 0.72, immediateRender: false }, 0.2);
+      timeline.fromTo(".action-card", { autoAlpha: 0, y: 40, rotation: -4 }, { autoAlpha: 1, y: 0, rotation: -1, duration: 0.65, ease: "back.out(1.45)", immediateRender: false }, 0.7);
+
+      actions.forEach((name, index) => {
+        const start = index * 4;
+        const copy = `#action-${name}`;
+        const chip = `[data-action-chip="${name}"]`;
+        const chipBackground = index >= 6 ? "rgba(255,255,255,.08)" : "rgba(255,255,255,.42)";
+        const chipBorder = index >= 6 ? "rgba(248,243,232,.32)" : "rgba(29,42,69,.28)";
+        const chipColor = index >= 6 ? "#f8f3e8" : "#1d2a45";
+        timeline.set(".action-copy", { autoAlpha: 0 }, start);
+        timeline.fromTo(copy, { autoAlpha: 0, x: -18, y: 10 }, { autoAlpha: 1, x: 0, y: 0, duration: 0.38, immediateRender: false }, start + 0.08);
+        timeline.set(".chip", { color: chipColor, backgroundColor: chipBackground, borderColor: chipBorder }, start);
+        timeline.to(chip, { color: "#1d2a45", backgroundColor: "#e7b83f", borderColor: "#1d2a45", duration: 0.24 }, start + 0.08);
+        timeline.fromTo(chip, { y: 0 }, { y: -8, duration: 0.24, repeat: 1, yoyo: true, ease: "power2.out", immediateRender: false }, start + 0.08);
+        XiaojiuRig.addAction(timeline, rig, "idle", { at: start, duration: 4 });
+      });
+
+      XiaojiuRig.addAction(timeline, rig, "blink", { at: 4.55 });
+      XiaojiuRig.addAction(timeline, rig, "talk", { at: 8.35, duration: 3.25 });
+      XiaojiuRig.addAction(timeline, rig, "teach", { at: 12.28, duration: 3.45 });
+      XiaojiuRig.addAction(timeline, rig, "think", { at: 16.28, duration: 3.45 });
+      XiaojiuRig.addAction(timeline, rig, "surprise", { at: 20.28, duration: 3.25 });
+      XiaojiuRig.addAction(timeline, rig, "nod", { at: 24.38, duration: 3.05 });
+      XiaojiuRig.addAction(timeline, rig, "wave", { at: 28.25, duration: 3.55 });
+
+      timeline.to("#paper-bg", { autoAlpha: 0, duration: 0.55 }, 11.75);
+      timeline.fromTo("#blue-bg", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.55, immediateRender: false }, 11.75);
+      timeline.to("#blue-bg", { autoAlpha: 0, duration: 0.55 }, 21.75);
+      timeline.fromTo("#dark-bg", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.55, immediateRender: false }, 21.75);
+      timeline.set([".chrome", ".copy", ".action-card"], { color: "#f8f3e8" }, 22.05);
+      timeline.set([".sub", ".action-use", ".action-index"], { color: "#dbe7ef" }, 22.05);
+      timeline.set(".eyebrow", { color: "#b7e1ec" }, 22.05);
+      timeline.set(".action-card", { backgroundColor: "rgba(22,34,58,.82)", borderColor: "#f8f3e8" }, 22.05);
+      timeline.set([".frame", ".rig-stage"], { borderColor: "rgba(248,243,232,.22)" }, 22.05);
+      timeline.set(".chip", { color: "#f8f3e8", backgroundColor: "rgba(255,255,255,.08)", borderColor: "rgba(248,243,232,.4)" }, 22.06);
+      timeline.set('[data-action-chip="surprise"]', { color: "#1d2a45", backgroundColor: "#e7b83f", borderColor: "#1d2a45" }, 22.06);
+      timeline.to(".motion-mark.one", { rotation: 18, scale: 1.12, duration: 2, repeat: 13, yoyo: true, ease: "sine.inOut" }, 0);
+      timeline.to(".motion-mark.two", { rotation: 112, scale: 0.86, duration: 1.6, repeat: 18, yoyo: true, ease: "sine.inOut" }, 0);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["xiaojiu-rig-demo"] = timeline;
+      })().catch((error) => console.error("Xiaojiu rig initialization failed.", error));
+    </script>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "assetVersion": "1.2.0",
+  "revision": "assembly-3",
+  "layout": {
+    "version": 1,
+    "stage": {
+      "id": "xiaojiu-rig-assembly",
+      "aspectRatio": 1.0714285714,
+      "anchor": "center",
+      "units": "percent",
+      "revision": "assembly-3"
+    },
+    "items": [
+      {"id": "eyes", "x": 48.26973157051281, "y": 31.727080216905374, "width": 35.8333, "aspectRatio": 2.6875, "scale": 1, "rotation": 0},
+      {"id": "eyes-half", "x": 49.14300380608975, "y": 31.990267382774817, "width": 35.8333, "aspectRatio": 2.6875, "scale": 1, "rotation": 0},
+      {"id": "eyes-closed", "x": 49.702023237179496, "y": 30.59755663373276, "width": 35.8333, "aspectRatio": 2.6875, "scale": 1, "rotation": 0},
+      {"id": "glasses", "x": 49.15740184294872, "y": 31.90629995616243, "width": 36.6667, "aspectRatio": 2.0625, "scale": 1.14, "rotation": 0},
+      {"id": "mouth", "x": 49.58120492788463, "y": 37.868833620448704, "width": 12, "aspectRatio": 1.08, "scale": 1, "rotation": 0},
+      {"id": "mouth-half", "x": 49.514222756410255, "y": 37.98703170300778, "width": 13, "aspectRatio": 1.0741, "scale": 1.1471599424375967, "rotation": 0},
+      {"id": "mouth-open", "x": 49.95054587339744, "y": 38.60058592539059, "width": 14, "aspectRatio": 0.9394, "scale": 1.0885079633103443, "rotation": 0},
+      {"id": "tie", "x": 50.70362580128205, "y": 54.47931991593831, "width": 14.6667, "aspectRatio": 0.6735, "scale": 1, "rotation": 0},
+      {"id": "feet", "x": 48.99902343749999, "y": 75.13647447228533, "width": 30, "aspectRatio": 2.867, "scale": 1, "rotation": -0.7038172898440962},
+      {"id": "left-folded", "x": 23.08, "y": 47.05, "width": 24.1667, "aspectRatio": 1.2391, "scale": 1, "rotation": -7},
+      {"id": "left-raised", "x": 18.495167267628204, "y": 39.275287762859115, "width": 29.3333, "aspectRatio": 0.9508, "scale": 1, "rotation": 8},
+      {"id": "right-folded", "x": 76.92, "y": 47.51, "width": 24.1667, "aspectRatio": 1.1875, "scale": 1, "rotation": -7},
+      {"id": "right-raised", "x": 80.9511748798077, "y": 37.623314144217154, "width": 29.3333, "aspectRatio": 0.95, "scale": 1.0548552601150496, "rotation": -8},
+      {"id": "right-point", "x": 83.1289563301282, "y": 38.963011498273794, "width": 37, "aspectRatio": 1.42, "scale": 1, "rotation": -3},
+      {"id": "right-fist", "x": 70.75754006410257, "y": 47.10227460246712, "width": 24.1667, "aspectRatio": 1.04, "scale": 1, "rotation": -11}
+    ]
+  },
+  "adjustments": {
+    "eyeGap": 108,
+    "footGap": 112
+  }
+}

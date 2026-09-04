@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "assetVersion": "1.0.0",
+  "revision": "face-calibration-1",
+  "eyeGap": 108,
+  "glassesScale": 1.14,
+  "mouthY": 178,
+  "tieY": 252
+}

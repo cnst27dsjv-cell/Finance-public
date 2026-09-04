@@ -1,0 +1,13 @@
+.wle-stage { position: relative; padding: 0; border: 0; overflow: visible; }
+.wle-item { position: absolute; margin: 0; transform-origin: center; }
+.wle-editing .wle-item { touch-action: none; user-select: none; cursor: grab; }
+.wle-editing .wle-item:active { cursor: grabbing; }
+.wle-editing .wle-selected { outline: 2px dashed #2d9d70; background: rgba(45,157,112,.07); z-index: 100; }
+.wle-item [data-wle-handle] { position: absolute; width: 28px; height: 28px; border: 2px solid #1c2a45; border-radius: 50%; padding: 0; background: #fff; color: #1c344b; touch-action: none; z-index: 101; font: 14px/1 system-ui,sans-serif; }
+.wle-item [data-wle-handle="scale"] { right: -14px; bottom: -14px; cursor: nwse-resize; }
+.wle-item [data-wle-handle="rotate"] { left: calc(50% - 14px); top: -42px; cursor: crosshair; }
+.wle-item [data-wle-handle][hidden] { display: none; }
+.wle-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px; background: #f8f5ed; color: #24364a; font: 14px/1.5 system-ui,sans-serif; }
+.wle-toolbar button,.wle-toolbar select { min-height: 38px; font: inherit; padding: 6px 10px; color: inherit; background: #fff; border: 1px solid #9da8b2; border-radius: 4px; }
+.wle-toolbar [role="status"] { flex-basis: 100%; color: #52627d; }
+.wle-toolbar :focus-visible,.wle-editing .wle-item:focus-visible { outline: 2px solid #47617b; outline-offset: 3px; }

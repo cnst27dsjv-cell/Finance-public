@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>小啾老师 · 角色装配台</title>
+    <script src="./vendor/gsap.min.js"></script>
+    <link rel="stylesheet" href="xiaojiu-rig.css?v=1.2.0">
+    <link rel="stylesheet" href="layout-editor/editor.css">
+    <style>
+      @font-face { font-family: "Tune Sans"; src: local("PingFang SC"); }
+      :root { color-scheme: light; --ink: #1c2a45; --muted: #637089; --paper: #f8f5ed; --gold: #e9b83d; --green: #2d9d70; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-width: 1180px; min-height: 100vh; color: var(--ink); font-family: "Tune Sans", sans-serif; background: #e7e3da; }
+      button, input, textarea, select { font: inherit; }
+      .page { min-height: 100vh; display: grid; grid-template-columns: minmax(720px, 1fr) 500px; gap: 22px; padding: 22px; }
+      .preview-panel, .control-panel { border: 2px solid rgba(28,42,69,.18); background: var(--paper); box-shadow: 0 18px 42px rgba(28,42,69,.12); }
+      .preview-panel { position: relative; min-height: 800px; overflow: hidden; }
+      .preview-panel::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(28,42,69,.15) 0 1px, transparent 1.5px); background-size: 28px 28px; opacity: .25; }
+      .preview-head { position: absolute; z-index: 10; left: 34px; right: 34px; top: 28px; display: flex; align-items: flex-start; justify-content: space-between; }
+      .eyebrow { font-size: 13px; font-weight: 900; letter-spacing: .2em; color: #52728a; }
+      h1 { margin: 8px 0 0; font-size: 32px; letter-spacing: .02em; }
+      .badge { padding: 8px 12px; border: 2px solid currentColor; font-size: 12px; font-weight: 900; letter-spacing: .12em; background: rgba(255,255,255,.7); }
+      .rig-zone { position: absolute; inset: 118px 28px 92px; display: grid; place-items: center; }
+      .rig-zone::before { content: ""; position: absolute; width: 620px; height: 620px; border: 3px dashed rgba(28,42,69,.18); border-radius: 50%; }
+      #assembly-stage { position: relative; width: 600px; height: 560px; transform: scale(1.04); transform-origin: center; }
+      #tune-rig { position: absolute; inset: 0; pointer-events: none; }
+      .layout-hitbox { z-index: 40; border: 1px solid transparent; background: transparent; }
+      .wle-editing .layout-hitbox:hover { border-color: rgba(45,157,112,.45); background: rgba(45,157,112,.035); }
+      .layout-hitbox.pose-hidden { display: none !important; }
+      #assembly-stage.action-preview .layout-hitbox { display: none !important; }
+      .reference-note { position: absolute; left: 34px; bottom: 28px; right: 34px; display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; font-weight: 700; }
+      .control-panel { padding: 24px; overflow: auto; }
+      .control-panel h2 { margin: 0; font-size: 25px; }
+      .intro { margin: 8px 0 18px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+      #layout-toolbar { margin: 0 -12px 10px; border: 1px solid rgba(28,42,69,.14); }
+      .section-title { margin: 22px 0 10px; font-size: 13px; font-weight: 900; letter-spacing: .14em; color: #52728a; }
+      .pose-group, .button-grid, .json-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
+      button { min-height: 40px; border: 2px solid var(--ink); color: var(--ink); background: #fff; font-weight: 850; cursor: pointer; }
+      button:hover { transform: translateY(-1px); box-shadow: 4px 4px 0 rgba(28,42,69,.14); }
+      button.active, button.primary { background: var(--gold); }
+      button.ghost { border-color: rgba(28,42,69,.24); }
+      .compact-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .control { padding: 12px; border: 1px solid rgba(28,42,69,.14); background: rgba(255,255,255,.68); }
+      .control-top { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; font-size: 13px; font-weight: 850; }
+      .control output { color: #3a7893; font-weight: 900; }
+      input[type="range"] { width: 100%; accent-color: var(--green); }
+      textarea { width: 100%; height: 130px; margin-top: 10px; padding: 12px; resize: vertical; border: 1px solid rgba(28,42,69,.22); color: var(--ink); background: #f3f0e9; font: 11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace; }
+      .status { min-height: 38px; margin-top: 14px; padding: 10px 12px; border-left: 5px solid var(--green); color: #466175; background: rgba(45,157,112,.09); font-size: 13px; line-height: 1.4; }
+      .danger { border-left-color: #c95f50; background: rgba(201,95,80,.09); color: #8f4038; }
+      .back { display: inline-flex; margin-top: 16px; color: #52627d; font-size: 13px; font-weight: 800; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="preview-panel" aria-label="小啾老师角色装配预览">
+        <header class="preview-head">
+          <div><div class="eyebrow">XIAOJIU ASSEMBLY EDITOR</div><h1>角色装配台</h1></div>
+          <div class="badge">600 × 560 固定坐标</div>
+        </header>
+        <div class="rig-zone">
+          <div id="assembly-stage">
+            <div id="tune-rig"></div>
+            <div class="layout-hitbox" data-layout-id="eyes" data-layout-label="眼睛 · 睁开"></div>
+            <div class="layout-hitbox pose-hidden" data-layout-id="eyes-half" data-layout-label="眼睛 · 半闭"></div>
+            <div class="layout-hitbox pose-hidden" data-layout-id="eyes-closed" data-layout-label="眼睛 · 闭合"></div>
+            <div class="layout-hitbox" data-layout-id="glasses" data-layout-label="眼镜"></div>
+            <div class="layout-hitbox" data-layout-id="mouth" data-layout-label="嘴部 · 闭合"></div>
+            <div class="layout-hitbox pose-hidden" data-layout-id="mouth-half" data-layout-label="嘴部 · 半张"></div>
+            <div class="layout-hitbox pose-hidden" data-layout-id="mouth-open" data-layout-label="嘴部 · 全张"></div>
+            <div class="layout-hitbox" data-layout-id="tie" data-layout-label="领带"></div>
+            <div class="layout-hitbox" data-layout-id="feet" data-layout-label="爪子组"></div>
+            <div class="layout-hitbox" data-layout-id="left-folded" data-layout-label="左翅 · 收拢"></div>
+            <div class="layout-hitbox pose-hidden" data-layout-id="left-raised" data-layout-label="左翅 · 抬起"></div>
+            <div class="layout-hitbox" data-layout-id="right-folded" data-layout-label="右翅 · 收拢"></div>
+            <div class="layout-hitbox pose-hidden" data-layout-id="right-raised" data-layout-label="右翅 · 抬起"></div>
+            <div class="layout-hitbox pose-hidden" data-layout-id="right-point" data-layout-label="右翅 · 指示"></div>
+            <div class="layout-hitbox pose-hidden" data-layout-id="right-fist" data-layout-label="右翅 · 握拳"></div>
+          </div>
+        </div>
+        <footer class="reference-note"><span>点击部件或从列表选择 · 拖动位置 · 圆点缩放 · 顶部旋转</span><span>资产 v1.2.0</span></footer>
+      </section>
+
+      <aside class="control-panel">
+        <h2>直接拖动部件</h2>
+        <p class="intro">三种眼睛与三种嘴型可独立校准；眼睛和爪子仍成对移动。浏览器草稿不会自动进入课程视频。</p>
+        <div id="layout-toolbar"></div>
+
+        <div class="section-title">眼睛状态</div>
+        <div class="pose-group">
+          <button type="button" class="active" data-pose-select="eyes">睁开</button>
+          <button type="button" data-pose-select="eyes-half">半闭</button>
+          <button type="button" data-pose-select="eyes-closed">闭合</button>
+        </div>
+        <div class="section-title">嘴部状态</div>
+        <div class="pose-group">
+          <button type="button" class="active" data-pose-select="mouth">闭合</button>
+          <button type="button" data-pose-select="mouth-half">半张</button>
+          <button type="button" data-pose-select="mouth-open">全张</button>
+        </div>
+
+        <div class="section-title">左翅膀姿势</div>
+        <div class="pose-group">
+          <button type="button" class="active" data-pose-select="left-folded">收拢</button>
+          <button type="button" data-pose-select="left-raised">抬起</button>
+        </div>
+        <div class="section-title">右翅膀姿势</div>
+        <div class="pose-group">
+          <button type="button" class="active" data-pose-select="right-folded">收拢</button>
+          <button type="button" data-pose-select="right-raised">抬起</button>
+          <button type="button" data-pose-select="right-point">指示</button>
+          <button type="button" data-pose-select="right-fist">握拳</button>
+        </div>
+
+        <div class="section-title">成对部件间距</div>
+        <div class="compact-controls">
+          <div class="control">
+            <div class="control-top"><label for="eyeGap">眼睛间距</label><output id="eyeGapValue"></output></div>
+            <input id="eyeGap" data-adjustment="eyeGap" type="range" min="72" max="120" step="1">
+          </div>
+          <div class="control">
+            <div class="control-top"><label for="footGap">爪子间距</label><output id="footGapValue"></output></div>
+            <input id="footGap" data-adjustment="footGap" type="range" min="84" max="140" step="1">
+          </div>
+        </div>
+
+        <div class="section-title">动作测试</div>
+        <div class="button-grid">
+          <button type="button" data-test-action="blink">眨眼</button>
+          <button type="button" data-test-action="talk">讲解口型</button>
+          <button type="button" data-test-action="teach">指示讲解</button>
+          <button type="button" data-test-action="think">思考</button>
+          <button type="button" data-test-action="surprise">惊讶</button>
+          <button type="button" data-test-action="wave">挥手</button>
+          <button type="button" data-test-action="nod">点头</button>
+          <button type="button" data-test-action="idle">呼吸待机</button>
+        </div>
+
+        <div class="section-title">完整装配预设</div>
+        <div class="button-grid">
+          <button type="button" id="resetPreset" class="primary">恢复正式预设</button>
+          <button type="button" id="clearDraft" class="ghost">清除本地草稿</button>
+        </div>
+        <textarea id="presetJson" spellcheck="false" aria-label="完整装配预设 JSON"></textarea>
+        <div class="json-actions">
+          <button type="button" id="applyJson">应用 JSON</button>
+          <button type="button" id="exportJson">下载 JSON</button>
+          <button type="button" id="copyJson">复制参数</button>
+          <button type="button" id="chooseJson">导入文件</button>
+        </div>
+        <input id="jsonFile" type="file" accept="application/json,.json" hidden>
+        <div id="status" class="status" role="status">正在载入正式装配预设……</div>
+        <a class="back" href="http://127.0.0.1:3007/#project/xiaojiu-rig">← 返回 32 秒动作预览</a>
+      </aside>
+    </main>
+
+    <script src="xiaojiu-rig.js?v=1.2.0"></script>
+    <script type="module">
+      import {mountLayoutEditor} from "./layout-editor/editor.mjs";
+
+      const clone = value => JSON.parse(JSON.stringify(value));
+      const adjustmentKey = "xiaojiu-rig:assembly-adjustments:assembly-3";
+      const stage = document.querySelector("#assembly-stage");
+      const statusBox = document.querySelector("#status");
+      const jsonBox = document.querySelector("#presetJson");
+      const adjustmentControls = Array.from(document.querySelectorAll("[data-adjustment]"));
+      let editor;
+      let currentPreset;
+      let authoredPreset;
+      let rig;
+      let testTimeline = null;
+      let eyePose = "eyes";
+      let mouthPose = "mouth";
+      let leftPose = "left-folded";
+      let rightPose = "right-folded";
+
+      function setStatus(message, isError = false) {
+        statusBox.textContent = message;
+        statusBox.classList.toggle("danger", isError);
+      }
+
+      function renderAdjustments() {
+        adjustmentControls.forEach((control) => {
+          const key = control.dataset.adjustment;
+          control.value = currentPreset.adjustments[key];
+          document.querySelector(`#${key}Value`).textContent = `${currentPreset.adjustments[key]} px`;
+        });
+      }
+
+      function showAssemblyPose() {
+        const eyeMap = {eyes: rig.eyesOpen, "eyes-half": rig.eyesHalf, "eyes-closed": rig.eyesClosed};
+        const mouthMap = {mouth: rig.mouthClosed, "mouth-half": rig.mouthHalf, "mouth-open": rig.mouthOpen};
+        const leftMap = {"left-folded": rig.leftFolded, "left-raised": rig.leftRaised};
+        const rightMap = {"right-folded": rig.rightFolded, "right-raised": rig.rightRaised, "right-point": rig.rightPoint, "right-fist": rig.rightFist};
+        gsap.set(Object.values(eyeMap), {autoAlpha: 0});
+        gsap.set(Object.values(mouthMap), {autoAlpha: 0});
+        gsap.set(Object.values(leftMap), {autoAlpha: 0});
+        gsap.set(Object.values(rightMap), {autoAlpha: 0});
+        gsap.set(eyeMap[eyePose], {autoAlpha: 1});
+        gsap.set(mouthMap[mouthPose], {autoAlpha: 1});
+        gsap.set(leftMap[leftPose], {autoAlpha: 1});
+        gsap.set(rightMap[rightPose], {autoAlpha: 1});
+        document.querySelectorAll('[data-layout-id="eyes"], [data-layout-id^="eyes-"]').forEach((node) => node.classList.toggle("pose-hidden", node.dataset.layoutId !== eyePose));
+        document.querySelectorAll('[data-layout-id="mouth"], [data-layout-id^="mouth-"]').forEach((node) => node.classList.toggle("pose-hidden", node.dataset.layoutId !== mouthPose));
+        document.querySelectorAll('[data-layout-id^="left-"]').forEach((node) => node.classList.toggle("pose-hidden", node.dataset.layoutId !== leftPose));
+        document.querySelectorAll('[data-layout-id^="right-"]').forEach((node) => node.classList.toggle("pose-hidden", node.dataset.layoutId !== rightPose));
+        document.querySelectorAll("[data-pose-select]").forEach((button) => button.classList.toggle("active",
+          button.dataset.poseSelect === eyePose || button.dataset.poseSelect === mouthPose ||
+          button.dataset.poseSelect === leftPose || button.dataset.poseSelect === rightPose));
+      }
+
+      function renderPreset(layout = currentPreset.layout) {
+        currentPreset.layout = clone(layout);
+        currentPreset = XiaojiuRig.applyAssemblyPreset(rig, currentPreset);
+        renderAdjustments();
+        showAssemblyPose();
+        jsonBox.value = JSON.stringify(currentPreset, null, 2);
+      }
+
+      function choosePose(id) {
+        if (id === "eyes" || id?.startsWith("eyes-")) eyePose = id;
+        if (id === "mouth" || id?.startsWith("mouth-")) mouthPose = id;
+        if (id?.startsWith("left-")) leftPose = id;
+        if (id?.startsWith("right-")) rightPose = id;
+        showAssemblyPose();
+      }
+
+      function stopTest() {
+        if (testTimeline) testTimeline.kill();
+        testTimeline = null;
+        stage.classList.remove("action-preview");
+        XiaojiuRig.reset(rig);
+        XiaojiuRig.applyAssemblyPreset(rig, currentPreset);
+        showAssemblyPose();
+      }
+
+      function playTest(name) {
+        stopTest();
+        stage.classList.add("action-preview");
+        const duration = {idle: 4, blink: 1.4, talk: 3.2, teach: 3.5, think: 3.4, surprise: 3.2, nod: 3, wave: 3.6}[name];
+        testTimeline = gsap.timeline({paused: true, onComplete: stopTest});
+        XiaojiuRig.addAction(testTimeline, rig, name, {at: 0, duration});
+        testTimeline.play(0);
+        setStatus(`正在测试动作：${name}`);
+      }
+
+      try {
+        authoredPreset = await XiaojiuRig.loadAssemblyPreset("assets/xiaojiu-assembly-preset.json");
+        currentPreset = clone(authoredPreset);
+        try {
+          const saved = localStorage.getItem(adjustmentKey);
+          if (saved) {
+            currentPreset.adjustments = JSON.parse(saved);
+            currentPreset = XiaojiuRig.validateAssemblyPreset(currentPreset);
+          }
+        } catch {
+          localStorage.removeItem(adjustmentKey);
+          currentPreset = clone(authoredPreset);
+        }
+        rig = XiaojiuRig.mount(document.querySelector("#tune-rig"), {assetBase: "assets/parts/", idPrefix: "xjt-rig", assemblyPreset: currentPreset});
+        editor = mountLayoutEditor({
+          stage,
+          toolbar: document.querySelector("#layout-toolbar"),
+          defaults: authoredPreset.layout,
+          projectId: "xiaojiu-rig",
+          enabled: true,
+          onRender: layout => renderPreset(layout),
+          onChange: layout => { currentPreset.layout = clone(layout); jsonBox.value = JSON.stringify(currentPreset, null, 2); },
+          onSelect: choosePose
+        });
+        renderPreset(editor.getLayout());
+        setStatus("装配台已就绪。拖动部件后会自动保存为当前浏览器草稿。");
+      } catch (error) {
+        setStatus(`装配台载入失败：${error.message}`, true);
+        throw error;
+      }
+
+      document.querySelectorAll("[data-pose-select]").forEach((button) => {
+        button.addEventListener("click", () => { choosePose(button.dataset.poseSelect); editor.select(button.dataset.poseSelect); });
+      });
+
+      adjustmentControls.forEach((control) => {
+        control.addEventListener("input", () => {
+          currentPreset.adjustments[control.dataset.adjustment] = Number(control.value);
+          localStorage.setItem(adjustmentKey, JSON.stringify(currentPreset.adjustments));
+          renderPreset(editor.getLayout());
+          setStatus("间距已更新并保存为浏览器草稿。");
+        });
+      });
+
+      document.querySelectorAll("[data-test-action]").forEach((button) => button.addEventListener("click", () => playTest(button.dataset.testAction)));
+
+      document.querySelector("#resetPreset").addEventListener("click", () => {
+        stopTest();
+        currentPreset = clone(authoredPreset);
+        localStorage.removeItem(adjustmentKey);
+        editor.importLayout(authoredPreset.layout);
+        renderPreset(editor.getLayout());
+        setStatus("已恢复项目中的正式装配预设。");
+      });
+
+      document.querySelector("#clearDraft").addEventListener("click", () => {
+        localStorage.removeItem(adjustmentKey);
+        const prefix = "web-layout-editor:1:xiaojiu-rig:xiaojiu-rig-assembly:";
+        Object.keys(localStorage).filter(key => key.startsWith(prefix)).forEach(key => localStorage.removeItem(key));
+        currentPreset = clone(authoredPreset);
+        editor.importLayout(authoredPreset.layout);
+        renderPreset(editor.getLayout());
+        Object.keys(localStorage).filter(key => key.startsWith(prefix)).forEach(key => localStorage.removeItem(key));
+        setStatus("本地草稿已清除，并恢复正式装配预设。");
+      });
+
+      document.querySelector("#applyJson").addEventListener("click", () => {
+        try {
+          const imported = XiaojiuRig.validateAssemblyPreset(JSON.parse(jsonBox.value));
+          stopTest(); currentPreset = clone(imported); editor.importLayout(imported.layout);
+          localStorage.setItem(adjustmentKey, JSON.stringify(imported.adjustments));
+          renderPreset(editor.getLayout()); setStatus("完整装配 JSON 已验证并应用。");
+        } catch (error) { setStatus(`无法应用：${error.message}`, true); }
+      });
+
+      document.querySelector("#exportJson").addEventListener("click", () => {
+        currentPreset.layout = editor.getLayout();
+        const url = URL.createObjectURL(new Blob([JSON.stringify(currentPreset, null, 2)], {type: "application/json"}));
+        const link = document.createElement("a"); link.href = url; link.download = "xiaojiu-assembly-preset.json"; link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000); setStatus("完整装配预设已下载。");
+      });
+
+      document.querySelector("#copyJson").addEventListener("click", async () => {
+        currentPreset.layout = editor.getLayout();
+        try { await navigator.clipboard.writeText(JSON.stringify(currentPreset, null, 2)); setStatus("完整装配参数已复制。"); }
+        catch { jsonBox.select(); setStatus("无法自动复制，已选中文本，请手动复制。", true); }
+      });
+
+      const fileInput = document.querySelector("#jsonFile");
+      document.querySelector("#chooseJson").addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", async () => {
+        if (!fileInput.files[0]) return;
+        try {
+          const imported = XiaojiuRig.validateAssemblyPreset(JSON.parse(await fileInput.files[0].text()));
+          currentPreset = clone(imported); editor.importLayout(imported.layout);
+          localStorage.setItem(adjustmentKey, JSON.stringify(imported.adjustments));
+          renderPreset(editor.getLayout());
+          setStatus(`已导入 ${fileInput.files[0].name}。`);
+        } catch (error) { setStatus(`导入失败：${error.message}`, true); }
+        finally { fileInput.value = ""; }
+      });
+    </script>
+  </body>
+</html>

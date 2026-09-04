@@ -1,0 +1,11 @@
+{
+  "name": "xiaojiu-rig-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.8.27 preview",
+    "check": "npx --yes hyperframes@0.8.27 check",
+    "render": "npx --yes hyperframes@0.8.27 render",
+    "test:layout": "node --test layout-editor/geometry.test.mjs"
+  }
+}

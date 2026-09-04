@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InvestQuest 教学动画 — L1-1 储蓄基础</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#080c16;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Noto Sans SC',sans-serif;overflow:hidden}
+
+  .stage{position:relative;width:1280px;height:720px;overflow:hidden;border-radius:16px;box-shadow:0 0 120px rgba(107,92,231,.15),0 0 60px rgba(255,213,64,.08)}
+
+  /* === 深空背景 === */
+  .bg-layer{position:absolute;inset:0;z-index:0;overflow:hidden}
+  .bg-gradient{position:absolute;inset:0;background:linear-gradient(170deg,#0d1525 0%,#162040 35%,#1a2850 55%,#0f1a30 100%)}
+  .bg-aurora{position:absolute;inset:0;opacity:.18;background:radial-gradient(ellipse 80% 50% at 30% 20%,rgba(107,92,231,.4),transparent),radial-gradient(ellipse 60% 40% at 70% 70%,rgba(255,179,0,.25),transparent);animation:auroraPulse 8s ease-in-out infinite alternate}
+  @keyframes auroraPulse{0%{opacity:.12;transform:scale(1)}100%{opacity:.22;transform:scale(1.05)}}
+  .grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(107,92,231,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(107,92,231,.03) 1px,transparent 1px);background-size:40px 40px;z-index:1}
+
+  /* === 粒子层 === */
+  .particles{position:absolute;inset:0;z-index:2;pointer-events:none}
+  .particle{position:absolute;border-radius:50%;pointer-events:none}
+  .particle.gold{background:radial-gradient(circle,#FFD54F,#FFB300);box-shadow:0 0 6px rgba(255,213,64,.5)}
+  .particle.purple{background:radial-gradient(circle,#B39DDB,#7E57C2);box-shadow:0 0 6px rgba(126,92,231,.4)}
+  .particle.white{background:radial-gradient(circle,rgba(255,255,255,.9),rgba(255,255,255,.3));box-shadow:0 0 4px rgba(255,255,255,.3)}
+
+  /* === 天际线 === */
+  .skyline{position:absolute;bottom:80px;left:0;right:0;height:240px;z-index:3;display:flex;align-items:flex-end;justify-content:center;gap:4px;padding:0 40px;opacity:.6}
+  .bldg{background:linear-gradient(180deg,#141e35,#0e1628);position:relative;flex-shrink:0;border-radius:2px 2px 0 0}
+  .bldg::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,rgba(107,92,231,.3),transparent)}
+  .bldg .win{position:absolute;width:6px;height:6px;border-radius:1px;image-rendering:pixelated}
+
+  /* === 地面 === */
+  .ground{position:absolute;bottom:0;left:0;right:0;height:80px;z-index:4;background:linear-gradient(180deg,#111b30,#0a1020);border-top:2px solid rgba(107,92,231,.15)}
+  .ground::before{content:'';position:absolute;top:2px;left:0;right:0;height:20px;background:linear-gradient(180deg,rgba(107,92,231,.06),transparent)}
+
+  /* === 角色 === */
+  .char-wrap{position:absolute;bottom:55px;right:100px;width:320px;height:380px;z-index:10;opacity:0}
+  .char-wrap img{width:100%;height:100%;object-fit:contain;image-rendering:auto;filter:drop-shadow(0 12px 40px rgba(0,0,0,.45)) drop-shadow(0 4px 12px rgba(255,179,0,.15))}
+  .char-glow{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:200px;height:30px;background:radial-gradient(ellipse,rgba(255,213,64,.12),transparent);border-radius:50%;z-index:-1}
+
+  /* === 顶部标题栏 === */
+  .top-bar{position:absolute;top:0;left:0;right:0;height:56px;z-index:20;display:flex;align-items:center;padding:0 24px;gap:16px;background:linear-gradient(135deg,rgba(107,92,231,.92),rgba(139,124,247,.88));backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.1)}
+  .top-bar::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,213,64,.3),transparent)}
+  .top-bar .badge{font-family:'Press Start 2P',monospace;font-size:9px;color:#FFD54F;background:rgba(0,0,0,.3);padding:5px 12px;border-radius:4px;border:1px solid rgba(255,213,64,.2);letter-spacing:1px}
+  .top-bar h1{font-size:18px;color:#fff;font-weight:900;letter-spacing:3px;text-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .top-bar .ep{font-family:'Press Start 2P',monospace;font-size:8px;color:rgba(255,255,255,.5);margin-left:auto}
+
+  /* === 知识气泡 === */
+  .bubble-zone{position:absolute;top:80px;left:40px;width:520px;z-index:15}
+  .bubble{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:24px 28px;margin-bottom:16px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.08);opacity:0;transform:translateX(-60px)}
+  .bubble::before{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(255,213,64,.05),transparent 60%);pointer-events:none}
+  .bubble::after{content:'';position:absolute;right:-10px;top:50%;transform:translateY(-50%);border-left:10px solid rgba(255,255,255,.1);border-top:7px solid transparent;border-bottom:7px solid transparent}
+  .bubble .ico{font-size:28px;display:block;margin-bottom:8px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
+  .bubble h3{font-size:17px;color:#FFD54F;font-weight:900;margin-bottom:8px;letter-spacing:1px}
+  .bubble p{font-size:14px;color:rgba(255,255,255,.75);line-height:1.8}
+  .bubble .px-val{font-family:'Press Start 2P',monospace;font-size:12px;color:#7EC97E;display:block;margin-top:12px;padding:6px 12px;background:rgba(126,201,126,.08);border-radius:8px;border:1px solid rgba(126,201,126,.15);width:fit-content}
+
+  /* === 字幕栏 === */
+  .sub-bar{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:25;background:rgba(0,0,0,.7);backdrop-filter:blur(16px);border-radius:16px;padding:14px 32px;max-width:880px;text-align:center;border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 32px rgba(0,0,0,.3);opacity:0}
+  .sub-bar .who{font-size:9px;color:#FFD54F;font-weight:700;margin-bottom:4px;font-family:'Press Start 2P',monospace;letter-spacing:2px;opacity:.8}
+  .sub-bar .line{font-size:16px;color:rgba(255,255,255,.95);font-weight:700;line-height:1.6;letter-spacing:.5px}
+
+  /* === 浮动金币 === */
+  .coin-layer{position:absolute;inset:0;z-index:12;pointer-events:none}
+  .gcoin{position:absolute;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFE082,#F5C542 50%,#C49B2A);border:2px solid rgba(184,134,11,.6);display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P',monospace;font-size:9px;color:#8B6914;box-shadow:0 2px 8px rgba(0,0,0,.2),inset 0 -2px 4px rgba(0,0,0,.1);opacity:0;image-rendering:pixelated}
+
+  /* === Logo 屏 === */
+  .logo-screen{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0d1525}
+  .logo-ring{position:absolute;width:200px;height:200px;border:2px solid rgba(107,92,231,.15);border-radius:50%;opacity:0}
+  .logo-dots{display:flex;gap:12px;margin-bottom:24px}
+  .logo-dot{width:12px;height:12px;border-radius:3px;opacity:0}
+  .logo-main{font-family:'Press Start 2P',monospace;font-size:28px;color:#FFD54F;opacity:0;text-shadow:0 0 40px rgba(255,213,64,.3),3px 3px 0 rgba(0,0,0,.2);letter-spacing:4px}
+  .logo-sub{font-size:14px;color:rgba(255,255,255,.35);margin-top:16px;opacity:0;letter-spacing:10px;font-weight:300}
+  .logo-line{width:60px;height:2px;background:linear-gradient(90deg,transparent,#FFD54F,transparent);margin-top:20px;opacity:0}
+
+  /* === 进度条 === */
+  .prog{position:absolute;bottom:0;left:0;right:0;height:3px;z-index:30;background:rgba(255,255,255,.04)}
+  .prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#6B5CE7,#FFD54F,#FFB300);border-radius:0 2px 2px 0;box-shadow:0 0 12px rgba(255,213,64,.3)}
+
+  /* === 重播按钮 === */
+  .btns{position:absolute;top:66px;right:16px;z-index:30}
+  .btn-replay{width:40px;height:40px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:rgba(255,213,64,.7);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:all .2s}
+  .btn-replay:hover{background:rgba(255,213,64,.1);color:#FFD54F;border-color:rgba(255,213,64,.3)}
+
+  /* === 总结卡片 === */
+  .summary-row{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:18;display:flex;gap:20px;opacity:0}
+  .s-card{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:24px 22px;text-align:center;width:185px;box-shadow:0 8px 32px rgba(0,0,0,.2);opacity:0;transform:translateY(50px)}
+  .s-card::before{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(255,213,64,.04),transparent 50%);pointer-events:none}
+  .s-card .s-ico{font-size:34px;display:block;margin-bottom:12px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.2))}
+  .s-card h4{font-size:14px;color:#FFD54F;font-weight:900;margin-bottom:6px;letter-spacing:1px}
+  .s-card p{font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
+
+  /* === 数据可视化装饰 === */
+  .data-viz{position:absolute;bottom:90px;left:60px;z-index:6;opacity:0}
+  .data-bar{display:flex;align-items:flex-end;gap:6px;height:80px}
+  .data-bar .bar{width:16px;border-radius:3px 3px 0 0;background:linear-gradient(180deg,rgba(107,92,231,.5),rgba(107,92,231,.15));position:relative}
+  .data-bar .bar::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:rgba(107,92,231,.8);border-radius:3px 3px 0 0}
+
+  /* === 闪光 === */
+  .flash{position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,213,64,.3),rgba(107,92,231,.1));z-index:50;opacity:0;pointer-events:none}
+
+  /* === 经验值弹窗 === */
+  .xp-popup{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:35;opacity:0;pointer-events:none}
+  .xp-badge{background:linear-gradient(135deg,#6B5CE7,#8B7CF7);border-radius:16px;padding:16px 32px;text-align:center;box-shadow:0 12px 48px rgba(107,92,231,.4);border:1px solid rgba(255,255,255,.15)}
+  .xp-badge .xp-label{font-family:'Press Start 2P',monospace;font-size:10px;color:rgba(255,255,255,.6);letter-spacing:2px}
+  .xp-badge .xp-val{font-family:'Press Start 2P',monospace;font-size:32px;color:#FFD54F;margin-top:6px;text-shadow:0 0 20px rgba(255,213,64,.4)}
+  .xp-badge .xp-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <!-- Logo 入场 -->
+  <div class="logo-screen" id="logoScreen">
+    <div class="logo-ring" id="logoRing1"></div>
+    <div class="logo-ring" id="logoRing2" style="width:280px;height:280px"></div>
+    <div class="logo-dots">
+      <div class="logo-dot" style="background:#6B5CE7"></div>
+      <div class="logo-dot" style="background:#FFD54F"></div>
+      <div class="logo-dot" style="background:#FFB300"></div>
+      <div class="logo-dot" style="background:#FF7750"></div>
+      <div class="logo-dot" style="background:#7EC97E"></div>
+    </div>
+    <div class="logo-main" id="logoMain">InvestQuest</div>
+    <div class="logo-line" id="logoLine"></div>
+    <div class="logo-sub" id="logoSub">投 资 探 索 者</div>
+  </div>
+
+  <!-- 背景层 -->
+  <div class="bg-layer">
+    <div class="bg-gradient"></div>
+    <div class="bg-aurora"></div>
+  </div>
+  <div class="grid-lines"></div>
+  <div class="particles" id="particleBox"></div>
+  <div class="skyline" id="skyBox"></div>
+  <div class="ground"></div>
+
+  <!-- 数据可视化装饰 -->
+  <div class="data-viz" id="dataViz">
+    <div class="data-bar" id="dataBar"></div>
+  </div>
+
+  <!-- 标题栏 -->
+  <div class="top-bar">
+    <span class="badge">L1-1</span>
+    <h1>储蓄基础</h1>
+    <span class="ep">EP.01 / 什么是储蓄</span>
+  </div>
+  <div class="btns">
+    <button class="btn-replay" id="btnReplay" title="重播">&#8635;</button>
+  </div>
+
+  <!-- 角色 -->
+  <div class="char-wrap" id="charWrap">
+    <img id="charImg" src="jinbao_idle.png" alt="金宝">
+    <div class="char-glow"></div>
+  </div>
+
+  <!-- 知识气泡 -->
+  <div class="bubble-zone">
+    <div class="bubble" id="b1">
+      <span class="ico">💰</span>
+      <h3>什么是储蓄？</h3>
+      <p>把今天暂时不用的钱留到明天<br>让钱在等待中变得更多</p>
+    </div>
+    <div class="bubble" id="b2">
+      <span class="ico">🏦</span>
+      <h3>银行为什么给利息？</h3>
+      <p>银行把你的钱借给企业<br>企业创造价值后支付利息<br>银行分一部分给你</p>
+      <span class="px-val">💡 你的钱创造了价值</span>
+    </div>
+    <div class="bubble" id="b3">
+      <span class="ico">✨</span>
+      <h3>储蓄的三大好处</h3>
+      <p>延迟消费 · 本金安全 · 获得利息<br>这是所有投资的起点！</p>
+    </div>
+  </div>
+
+  <!-- 总结卡片 -->
+  <div class="summary-row" id="summaryRow">
+    <div class="s-card" id="sc1"><span class="s-ico">⏳</span><h4>延迟消费</h4><p>克制冲动，让钱发挥更大价值</p></div>
+    <div class="s-card" id="sc2"><span class="s-ico">🛡️</span><h4>本金安全</h4><p>储蓄是最稳健的理财方式</p></div>
+    <div class="s-card" id="sc3"><span class="s-ico">💰</span><h4>获得利息</h4><p>时间越长，复利效果越惊人</p></div>
+  </div>
+
+  <!-- 经验值弹窗 -->
+  <div class="xp-popup" id="xpPopup">
+    <div class="xp-badge">
+      <div class="xp-label">EXPERIENCE</div>
+      <div class="xp-val" id="xpVal">+50 XP</div>
+      <div class="xp-sub">课程完成！</div>
+    </div>
+  </div>
+
+  <!-- 金币 -->
+  <div class="coin-layer" id="coinLayer"></div>
+
+  <!-- 字幕 -->
+  <div class="sub-bar" id="subBar">
+    <div class="who">JINBAO</div>
+    <div class="line" id="subText"></div>
+  </div>
+
+  <!-- 进度 -->
+  <div class="prog"><div class="prog-fill" id="progFill"></div></div>
+  <div class="flash" id="flash"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+// ========== 初始化场景 ==========
+
+// 粒子系统
+const particleBox = document.getElementById('particleBox');
+for (let i = 0; i < 50; i++) {
+  const p = document.createElement('div');
+  const types = ['gold','purple','white'];
+  const type = types[Math.floor(Math.random()*3)];
+  const size = type === 'white' ? (2 + Math.random()*2) : (3 + Math.random()*4);
+  p.className = 'particle ' + type;
+  p.style.width = size + 'px';
+  p.style.height = size + 'px';
+  p.style.left = (Math.random()*100) + '%';
+  p.style.top = (Math.random()*80) + '%';
+  p.style.opacity = '0';
+  particleBox.appendChild(p);
+}
+
+// 天际线
+const skyBox = document.getElementById('skyBox');
+const bldgs = [
+  {w:32,h:60},{w:44,h:110},{w:28,h:50},{w:50,h:140},{w:36,h:75},
+  {w:56,h:160},{w:38,h:85},{w:46,h:120},{w:30,h:55},{w:52,h:145},
+  {w:40,h:95},{w:48,h:130},{w:34,h:65},{w:42,h:105},{w:54,h:150},
+  {w:36,h:70},{w:44,h:115},{w:32,h:58}
+];
+bldgs.forEach(b => {
+  const el = document.createElement('div');
+  el.className = 'bldg';
+  el.style.width = b.w + 'px';
+  el.style.height = b.h + 'px';
+  const cols = Math.floor(b.w / 14);
+  const rows = Math.floor(b.h / 16);
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (Math.random() > 0.4) {
+        const w = document.createElement('div');
+        w.className = 'win';
+        const colors = ['#FFD54F','#FFD54F','#FFD54F','#7EC97E','#8B7CF7'];
+        w.style.background = colors[Math.floor(Math.random()*colors.length)];
+        w.style.left = (4 + c * 14) + 'px';
+        w.style.top = (6 + r * 16) + 'px';
+        w.style.opacity = (Math.random() * 0.35 + 0.15).toFixed(2);
+        el.appendChild(w);
+      }
+    }
+  }
+  skyBox.appendChild(el);
+});
+
+// 数据柱状图
+const dataBar = document.getElementById('dataBar');
+const barHeights = [25,35,30,45,55,50,65,60,75,70];
+barHeights.forEach(h => {
+  const bar = document.createElement('div');
+  bar.className = 'bar';
+  bar.style.height = h + 'px';
+  dataBar.appendChild(bar);
+});
+
+// 金币
+const coinLayer = document.getElementById('coinLayer');
+for (let i = 0; i < 16; i++) {
+  const c = document.createElement('div');
+  c.className = 'gcoin';
+  c.textContent = '¥';
+  c.style.left = (5 + Math.random() * 90) + '%';
+  c.style.top = (30 + Math.random() * 40) + '%';
+  coinLayer.appendChild(c);
+}
+
+// ========== GSAP 主动画 ==========
+const TOTAL = 28;
+const tl = gsap.timeline({ defaults: { ease: 'power2.out' }, paused: true });
+
+// === 浮动粒子持续动画 ===
+const particleTL = gsap.timeline({ repeat: -1 });
+document.querySelectorAll('.particle').forEach((p, i) => {
+  gsap.to(p, {
+    y: -(20 + Math.random() * 60),
+    x: (Math.random() - 0.5) * 40,
+    opacity: (Math.random() * 0.5 + 0.2),
+    duration: 3 + Math.random() * 4,
+    ease: 'sine.inOut',
+    yoyo: true,
+    repeat: -1,
+    delay: Math.random() * 3
+  });
+});
+
+// ---------- 0-3.5s: Logo ----------
+tl.addLabel('logo', 0);
+
+// 光环扩散
+tl.to('#logoRing1', { opacity: 0.4, scale: 1, duration: 1, ease: 'power1.out' }, 'logo');
+tl.to('#logoRing1', { opacity: 0, scale: 1.8, duration: 1.5, ease: 'power1.out' }, 'logo+=0.8');
+tl.to('#logoRing2', { opacity: 0.2, scale: 1, duration: 1, ease: 'power1.out' }, 'logo+=0.3');
+tl.to('#logoRing2', { opacity: 0, scale: 1.6, duration: 1.5, ease: 'power1.out' }, 'logo+=1.1');
+
+// 圆点入场
+tl.to('.logo-dot', {
+  opacity: 1, scale: 1, stagger: 0.1, duration: 0.4, ease: 'back.out(3)'
+}, 'logo+=0.3');
+tl.from('.logo-dot', {
+  scale: 0, stagger: 0.1, duration: 0.4, ease: 'back.out(3)'
+}, 'logo+=0.3');
+
+// 标题入场
+tl.to('#logoMain', { opacity: 1, duration: 0.6 }, 'logo+=0.9');
+tl.from('#logoMain', { y: 15, duration: 0.6, ease: 'power2.out' }, 'logo+=0.9');
+tl.to('#logoLine', { opacity: 1, duration: 0.4 }, 'logo+=1.4');
+tl.from('#logoLine', { scaleX: 0, duration: 0.5, ease: 'power2.out' }, 'logo+=1.4');
+tl.to('#logoSub', { opacity: 1, duration: 0.5 }, 'logo+=1.7');
+
+// Logo 退场
+tl.to('#logoScreen', {
+  opacity: 0, duration: 0.6, ease: 'power1.inOut',
+  onComplete: () => { document.getElementById('logoScreen').style.display = 'none'; }
+}, 'logo+=2.8');
+
+// ---------- 3.5-6s: 场景构建 ----------
+tl.addLabel('scene', 3.5);
+
+// 建筑升起
+tl.from('.bldg', {
+  y: 280, opacity: 0, duration: 0.8,
+  stagger: { each: 0.035, from: 'center' },
+  ease: 'power3.out'
+}, 'scene');
+tl.to('.skyline', { opacity: 0.6, duration: 0.3 }, 'scene');
+
+// 窗户亮起
+tl.from('.win', {
+  opacity: 0, scale: 0, duration: 0.3,
+  stagger: { each: 0.008, from: 'random' },
+  ease: 'back.out(2)'
+}, 'scene+=0.5');
+
+// 数据可视化
+tl.to('#dataViz', { opacity: 0.5, duration: 0.6 }, 'scene+=0.8');
+tl.from('.bar', {
+  scaleY: 0, transformOrigin: 'bottom', duration: 0.5,
+  stagger: { each: 0.04, from: 'start' },
+  ease: 'power2.out'
+}, 'scene+=0.8');
+
+// ---------- 6-8s: 金宝入场 ----------
+tl.addLabel('enter', 6);
+
+// 角色弹入
+tl.to('#charWrap', { opacity: 1, duration: 0.01 }, 'enter');
+tl.fromTo('#charWrap', {
+  y: 350, scale: 0.5
+}, {
+  y: 0, scale: 1, duration: 0.9, ease: 'back.out(1.5)'
+}, 'enter');
+
+// 落地冲击 - 金币散出
+tl.to('.gcoin', {
+  opacity: 0.7, 
+  y: -(30 + Math.random()*40),
+  x: (Math.random()-0.5)*60,
+  duration: 1.2,
+  stagger: { each: 0.05, from: 'random' },
+  ease: 'power2.out'
+}, 'enter+=0.7');
+
+// idle 呼吸
+tl.to('#charWrap', {
+  y: '-=6', duration: 1.5, ease: 'sine.inOut', yoyo: true, repeat: -1
+}, 'enter+=1.2');
+
+// ---------- 7.5s: 字幕栏 ----------
+tl.addLabel('sub0', 7.5);
+tl.to('#subBar', { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 'sub0');
+tl.from('#subBar', { y: 20, duration: 0.4, ease: 'power2.out' }, 'sub0');
+tl.call(() => {
+  document.getElementById('subText').textContent =
+    '嗨！我是金宝，你的财富小伙伴！今天我们来聊聊——什么是储蓄？';
+}, null, 'sub0');
+
+// ---------- 9-12s: 气泡1 ----------
+tl.addLabel('b1', 9);
+
+tl.call(() => {
+  document.getElementById('charImg').src = 'jinbao_explain.png';
+}, null, 'b1');
+
+tl.to('#b1', {
+  opacity: 1, x: 0, duration: 0.7, ease: 'back.out(1.2)'
+}, 'b1+=0.3');
+
+tl.call(() => {
+  document.getElementById('subText').textContent =
+    '储蓄就是把今天暂时不用的钱留到明天——让钱在等待中变得更多！';
+}, null, 'b1+=0.5');
+
+// ---------- 12.5-16s: 气泡2 ----------
+tl.addLabel('b2', 12.5);
+
+tl.to('#b1', { opacity: 0.15, scale: 0.95, duration: 0.4, ease: 'power1.inOut' }, 'b2');
+
+tl.call(() => {
+  document.getElementById('charImg').src = 'jinbao_think.png';
+}, null, 'b2+=0.1');
+
+tl.to('#b2', {
+  opacity: 1, x: 0, duration: 0.7, ease: 'back.out(1.2)'
+}, 'b2+=0.3');
+
+tl.call(() => {
+  document.getElementById('subText').textContent =
+    '银行为什么给你利息？因为它把你的钱借给企业，企业创造了价值，利息就是你的回报！';
+}, null, 'b2+=0.5');
+
+// 数据柱状图动态增长
+tl.to('.bar', {
+  scaleY: 1.3, transformOrigin: 'bottom', duration: 1.5,
+  stagger: { each: 0.06, from: 'start' },
+  ease: 'power1.inOut', yoyo: true, repeat: 1
+}, 'b2+=0.5');
+
+// ---------- 16.5-20s: 气泡3 ----------
+tl.addLabel('b3', 16.5);
+
+tl.to('#b2', { opacity: 0.15, scale: 0.95, duration: 0.4, ease: 'power1.inOut' }, 'b3');
+
+tl.call(() => {
+  document.getElementById('charImg').src = 'jinbao_happy.png';
+}, null, 'b3+=0.1');
+
+tl.to('#b3', {
+  opacity: 1, x: 0, duration: 0.7, ease: 'back.out(1.2)'
+}, 'b3+=0.3');
+
+// 闪光强调
+tl.to('#flash', {
+  opacity: 0.12, duration: 0.15, yoyo: true, repeat: 1
+}, 'b3+=0.8');
+
+tl.call(() => {
+  document.getElementById('subText').textContent =
+    '记住哦：储蓄有三大好处——延迟消费、本金安全、获得利息。这是所有投资的起点！';
+}, null, 'b3+=0.5');
+
+// 金币飘动
+tl.to('.gcoin', {
+  y: '-=80', rotation: 360, opacity: 0.9,
+  duration: 3, stagger: { each: 0.1, from: 'random' },
+  ease: 'power1.out'
+}, 'b3+=0.5');
+
+// ---------- 20.5-24.5s: 总结卡片 ----------
+tl.addLabel('summary', 20.5);
+
+// 气泡淡出
+tl.to(['#b1','#b2','#b3'], {
+  opacity: 0, y: -40, duration: 0.5, stagger: 0.08
+}, 'summary');
+
+// 数据可视化淡出
+tl.to('#dataViz', { opacity: 0, duration: 0.3 }, 'summary');
+
+// 总结卡片入场
+tl.to('#summaryRow', { opacity: 1, duration: 0.3 }, 'summary+=0.4');
+tl.to('.s-card', {
+  opacity: 1, y: 0, duration: 0.6,
+  stagger: 0.18, ease: 'back.out(1.4)'
+}, 'summary+=0.4');
+
+// 庆祝表情
+tl.call(() => {
+  document.getElementById('charImg').src = 'jinbao_celebrate.png';
+}, null, 'summary+=0.8');
+
+tl.call(() => {
+  document.getElementById('subText').textContent =
+    '恭喜你学会了储蓄的基础知识！下一课，我们来看看复利的魔力！';
+}, null, 'summary+=1');
+
+// ---------- 24.5-28s: 经验值 + 退场 ----------
+tl.addLabel('out', 24.5);
+
+// XP弹窗
+tl.to('#xpPopup', { opacity: 1, duration: 0.01 }, 'out');
+tl.fromTo('#xpPopup', {
+  scale: 0.5, y: 30
+}, {
+  scale: 1, y: 0, opacity: 1, duration: 0.5, ease: 'back.out(2)'
+}, 'out');
+
+// XP数字动画
+tl.call(() => {
+  const xpEl = document.getElementById('xpVal');
+  let count = 0;
+  const interval = setInterval(() => {
+    count += 5;
+    if (count >= 50) { count = 50; clearInterval(interval); }
+    xpEl.textContent = '+' + count + ' XP';
+  }, 30);
+}, null, 'out+=0.3');
+
+// 卡片退场
+tl.to('.s-card', {
+  opacity: 0, y: -50, duration: 0.5, stagger: 0.1
+}, 'out+=2');
+
+// XP退场
+tl.to('#xpPopup', { opacity: 0, y: -30, duration: 0.4 }, 'out+=2.5');
+
+// 字幕退场
+tl.to('#subBar', { opacity: 0, y: 20, duration: 0.5 }, 'out+=2.8');
+
+// 角色退场
+tl.to('#charWrap', {
+  y: 300, opacity: 0, duration: 0.7, ease: 'power2.in'
+}, 'out+=3');
+
+// ========== 进度条 ==========
+gsap.to('#progFill', { width: '100%', duration: TOTAL, ease: 'none' });
+
+// ========== 窗户闪烁 (持续) ==========
+function flickerWindows() {
+  document.querySelectorAll('.win').forEach(w => {
+    if (Math.random() > 0.85) {
+      gsap.to(w, {
+        opacity: Math.random() * 0.4 + 0.1,
+        duration: 0.3 + Math.random() * 0.5,
+        onComplete: () => {
+          gsap.to(w, { opacity: Math.random() * 0.3 + 0.15, duration: 0.4 });
+        }
+      });
+    }
+  });
+}
+setInterval(flickerWindows, 2000);
+
+// ========== 重播 ==========
+document.getElementById('btnReplay').addEventListener('click', () => {
+  tl.restart();
+  gsap.set('#progFill', { width: '0%' });
+  gsap.to('#progFill', { width: '100%', duration: TOTAL, ease: 'none' });
+});
+
+// 自动播放
+tl.play();
+</script>
+</body>
+</html>

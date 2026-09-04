@@ -28,16 +28,14 @@ const COURSES: Course[] = [
   {
     id: 'L1-1',
     level: 1,
-    title: '储蓄基础',
+    title: '储蓄与复利',
     description: '了解储蓄的本质和复利的魔力',
     icon: '💰',
     unlocked: true,
     completed: false,
     contentType: 'video',
     lessons: [
-      { id: 'L1-1-1', title: '什么是储蓄', type: 'animation', duration: '90秒', completed: false },
-      { id: 'L1-1-2', title: '单利与复利', type: 'animation', duration: '60秒', completed: false },
-      { id: 'L1-1-3', title: '复利的魔力演示', type: 'animation', duration: '90秒', completed: false },
+      { id: 'L1-1-1', title: '储蓄与复利', type: 'animation', duration: '2分54秒', completed: false },
       { id: 'L1-1-4', title: '章节测验', type: 'quiz', duration: '5题', completed: false },
     ],
   },
@@ -367,16 +365,16 @@ const QUIZZES: Record<string, { question: string; options: string[]; correct: nu
       explanation: '货币基金流动性好，风险低，适合管理零花钱！'
     },
     {
-      question: '货币基金的收益通常是？',
-      options: ['20-30%', '2-3%', '50%以上', '保证亏损'],
+      question: '货币基金主要投资于哪类资产？',
+      options: ['高波动股票', '短期、流动性较好的货币市场工具', '房地产', '收藏品'],
       correct: 1,
-      explanation: '货币基金收益稳定，通常在2-3%左右。'
+      explanation: '货币基金主要投资短期、流动性较好的货币市场工具。'
     },
     {
-      question: 'T+0是什么意思？',
-      options: ['今天买明天卖', '当天就可以赎回', '一年后才能取', '只能存定期'],
-      correct: 1,
-      explanation: 'T+0就是当天就可以赎回，流动性很好！'
+      question: '观察货币基金近期收益表现时，常见的参考指标是什么？',
+      options: ['七日年化收益率', '股票市盈率', '房屋租金率', '债券票面价格'],
+      correct: 0,
+      explanation: '七日年化收益率是根据货币基金最近七日收益进行年化换算的参考指标，会随市场变化，不代表未来保证收益。'
     },
     {
       question: '货币基金的风险水平是？',
@@ -414,7 +412,7 @@ const QUIZZES: Record<string, { question: string; options: string[]; correct: nu
       question: '市场利率上升时，债券价格通常会？',
       options: ['上涨', '下跌', '不变', '翻倍'],
       correct: 1,
-      explanation: '市场利率上升，原有债券吸引力下降，价格下跌。'
+      explanation: '对同风险、同期限债券，市场要求收益率通常随市场利率上升，并作为折现率；折现率上升会使未来票息和本金的现值下降，因此债券价格通常下跌。'
     },
     {
       question: '国债的信用风险通常比企业债？',
@@ -425,10 +423,10 @@ const QUIZZES: Record<string, { question: string; options: string[]; correct: nu
   ],
   'L1-4': [
     {
-      question: '银行理财产品的期限通常是？',
-      options: ['无期限', '1个月到1年', '只能存5年', '必须存到退休'],
-      correct: 1,
-      explanation: '银行理财有固定期限，从1个月到1年都有。'
+      question: '购买有封闭期的银行理财产品前，首先要确认什么？',
+      options: ['期限和赎回安排是否匹配用钱计划', '广告颜色是否醒目', '产品名称是否好听', '销售页面是否热闹'],
+      correct: 0,
+      explanation: '封闭期内资金可能无法提前赎回，因此期限必须匹配实际用钱计划。'
     },
     {
       question: '预期收益率是什么意思？',
@@ -443,10 +441,10 @@ const QUIZZES: Record<string, { question: string; options: string[]; correct: nu
       explanation: '不同理财产品风险差别很大，要仔细看说明书！'
     },
     {
-      question: '保本型理财产品保证？',
-      options: ['不保证', '本金安全', '收益翻倍', '本金损失'],
-      correct: 1,
-      explanation: '保本型理财产品保证本金安全，收益可能有浮动。'
+      question: '关于现行银行理财产品，哪项说法正确？',
+      options: ['等同于银行存款', '保证本金和收益', '一般不保证本金和收益，应结合净值和底层资产判断风险', '只要由银行销售就没有风险'],
+      correct: 2,
+      explanation: '银行理财不是存款，一般不保证本金和收益，投资者需要承担相应风险。'
     },
     {
       question: '购买理财产品时要注意？',
@@ -943,6 +941,7 @@ function Learning() {
   const [quizAnswers, setQuizAnswers] = useState<number[]>([])
   const [showQuizResult, setShowQuizResult] = useState(false)
   const [quizCurrentQuestion, setQuizCurrentQuestion] = useState(0)
+  const [videoLoadError, setVideoLoadError] = useState(false)
   const { addExperience, addGold, completeCourse, hasCompletedCourse } = useUserStore()
 
   // 检查Level 1是否全部完成
@@ -988,6 +987,7 @@ function Learning() {
       setShowQuizResult(false)
       setQuizCurrentQuestion(0)
       setCurrentLesson(0)
+      setVideoLoadError(false)
     }
   }, [selectedCourse?.id])
 
@@ -1206,6 +1206,34 @@ function Learning() {
     }
 
     if (selectedCourse.contentType === 'video') {
+      if (lesson.id === 'L1-1-1') {
+        return (
+          <div className="video-lesson">
+            <div className="lesson-video-player-shell">
+              <video
+                className="lesson-video-player"
+                controls
+                playsInline
+                preload="metadata"
+                aria-label="储蓄与复利课程视频"
+                onError={() => setVideoLoadError(true)}
+              >
+                <source src="/videos/lessons/L1.mp4" type="video/mp4" />
+                您的浏览器暂不支持视频播放。
+              </video>
+            </div>
+            {videoLoadError && (
+              <p className="lesson-video-error" role="alert">
+                视频暂时无法加载，请刷新页面后重试。
+              </p>
+            )}
+            <button className="complete-lesson-button" onClick={handleLessonComplete}>
+              完成学习
+            </button>
+          </div>
+        )
+      }
+
       return (
         <div className="video-lesson">
           <div className="video-placeholder">

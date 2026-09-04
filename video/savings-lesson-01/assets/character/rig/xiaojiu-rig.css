@@ -1,0 +1,337 @@
+.xj-rig {
+  position: relative;
+  width: 600px;
+  height: 560px;
+  overflow: visible;
+  isolation: isolate;
+  transform-origin: 50% 88%;
+  --xj-body-width: 460px;
+  --xj-eye-left-x: 198.5px;
+  --xj-eye-right-x: 306.5px;
+  --xj-eye-size: 95px;
+  --xj-eye-y: 154px;
+  --xj-glasses-scale: 1.14;
+  --xj-mouth-y: 178px;
+  --xj-tie-y: 252px;
+}
+
+.xj-rig,
+.xj-rig * {
+  box-sizing: border-box;
+}
+
+.xj-rig img {
+  display: block;
+  max-width: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.xj-shadow {
+  position: absolute;
+  z-index: 0;
+  left: 150px;
+  bottom: 50px;
+  width: 300px;
+  height: 34px;
+  border: 5px solid rgba(44, 39, 34, 0.22);
+  border-top: 0;
+  border-radius: 50%;
+  transform: rotate(-2deg);
+}
+
+.xj-breath-bone,
+.xj-body-bone,
+.xj-face-bone,
+.xj-wing-bone,
+.xj-foot-bone,
+.xj-tie-bone {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 78%;
+}
+
+.xj-breath-bone,
+.xj-body-bone,
+.xj-face-bone,
+.xj-wing-bone,
+.xj-tie-bone {
+  will-change: transform;
+}
+
+.xj-part {
+  position: absolute;
+}
+
+.xj-body {
+  z-index: 2;
+  left: 70px;
+  top: 38px;
+  width: var(--xj-body-width);
+  height: auto;
+}
+
+.xj-wing-bone {
+  z-index: 3;
+  transform-origin: 50% 50%;
+}
+
+.xj-wing-bone.xj-left {
+  transform-origin: 29% 53%;
+}
+
+.xj-wing-bone.xj-right {
+  transform-origin: 71% 53%;
+}
+
+.xj-wing {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.xj-wing.xj-folded.xj-left {
+  left: 66px;
+  top: 205px;
+  width: 145px;
+  transform: rotate(-7deg);
+}
+
+.xj-wing.xj-folded.xj-right {
+  left: 389px;
+  top: 205px;
+  width: 145px;
+  transform: rotate(-7deg);
+}
+
+.xj-wing.xj-raised.xj-left {
+  left: 20px;
+  top: 94px;
+  width: 176px;
+  transform: scaleX(-1) rotate(-8deg);
+}
+
+.xj-wing.xj-raised.xj-right {
+  left: 405px;
+  top: 94px;
+  width: 176px;
+  transform: rotate(-8deg);
+}
+
+.xj-wing.xj-point.xj-right {
+  left: 387px;
+  top: 175px;
+  width: 222px;
+  transform: rotate(-3deg);
+}
+
+.xj-wing.xj-fist.xj-right {
+  left: 380px;
+  top: 140px;
+  width: 145px;
+  transform: rotate(-11deg);
+}
+
+.xj-face-bone {
+  z-index: 4;
+  transform-origin: 50% 44%;
+}
+
+.xj-eye-state {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.xj-eye {
+  top: var(--xj-eye-y);
+  width: var(--xj-eye-size);
+}
+
+.xj-eye.xj-left {
+  left: var(--xj-eye-left-x);
+}
+
+.xj-eye.xj-right {
+  left: var(--xj-eye-right-x);
+}
+
+.xj-eye-state.xj-half .xj-eye {
+  top: calc(var(--xj-eye-y) + 6px);
+}
+
+.xj-eye-state.xj-closed .xj-eye {
+  top: calc(var(--xj-eye-y) + 12px);
+}
+
+.xj-glasses {
+  left: 190px;
+  top: 130px;
+  width: 220px;
+  transform: scale(var(--xj-glasses-scale));
+  transform-origin: 50% 50%;
+}
+
+.xj-mouth {
+  left: 264px;
+  top: var(--xj-mouth-y);
+  width: 72px;
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: 50% 50%;
+}
+
+.xj-mouth-group {
+  position: absolute;
+  inset: 0;
+}
+
+.xj-mouth.xj-half {
+  left: 261px;
+  top: calc(var(--xj-mouth-y) - 2px);
+  width: 78px;
+}
+
+.xj-mouth.xj-open {
+  left: 258px;
+  top: calc(var(--xj-mouth-y) - 7px);
+  width: 84px;
+}
+
+.xj-tie-bone {
+  z-index: 5;
+  transform-origin: 50% 47%;
+}
+
+.xj-tie {
+  left: 256px;
+  top: var(--xj-tie-y);
+  width: 88px;
+}
+
+.xj-foot-bone {
+  z-index: 1;
+}
+
+.xj-foot {
+  top: 392px;
+  width: 68px;
+}
+
+.xj-foot.xj-left {
+  left: 210px;
+}
+
+.xj-foot.xj-right {
+  left: 322px;
+}
+
+.xj-rig[data-assembly-revision] .xj-eye-state {
+  inset: auto;
+}
+
+.xj-rig[data-assembly-revision] .xj-eye {
+  top: 0;
+  width: var(--xj-eye-width-percent);
+}
+
+.xj-rig[data-assembly-revision] .xj-eye.xj-left {
+  left: var(--xj-eye-left-percent);
+}
+
+.xj-rig[data-assembly-revision] .xj-eye.xj-right {
+  left: var(--xj-eye-right-percent);
+}
+
+.xj-rig[data-assembly-revision] .xj-eye-state.xj-half .xj-eye {
+  top: 0;
+}
+
+.xj-rig[data-assembly-revision] .xj-eye-state.xj-closed .xj-eye {
+  top: 0;
+}
+
+.xj-rig[data-assembly-revision] .xj-mouth-group {
+  inset: 0;
+}
+
+.xj-rig[data-assembly-revision] .xj-mouth {
+  top: 0;
+}
+
+.xj-rig[data-assembly-revision] .xj-foot-bone {
+  inset: auto;
+}
+
+.xj-rig[data-assembly-revision] .xj-foot {
+  top: 0;
+  width: var(--xj-foot-width-percent);
+}
+
+.xj-rig[data-assembly-revision] .xj-foot.xj-left {
+  left: var(--xj-foot-left-percent);
+}
+
+.xj-rig[data-assembly-revision] .xj-foot.xj-right {
+  left: var(--xj-foot-right-percent);
+}
+
+.xj-pointer {
+  position: absolute;
+  z-index: 6;
+  left: 492px;
+  top: 113px;
+  width: 9px;
+  height: 238px;
+  border: 3px solid rgba(58, 44, 34, 0.42);
+  border-radius: 999px;
+  background: #4a3528;
+  box-shadow: inset 2px 0 rgba(255, 255, 255, 0.22);
+  transform-origin: 50% 92%;
+  transform: rotate(36deg);
+  opacity: 0;
+  visibility: hidden;
+}
+
+.xj-spark {
+  position: absolute;
+  z-index: 7;
+  left: 430px;
+  top: 78px;
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.xj-spark::before,
+.xj-spark::after {
+  content: "";
+  position: absolute;
+  inset: 9px -8px;
+  border-radius: 99px;
+  background: #e5b844;
+}
+
+.xj-spark::after {
+  transform: rotate(90deg);
+}
+
+.xj-rig[data-facing="left"] {
+  transform: scaleX(-1);
+}
+
+.xj-rig[data-facing="left"] .xj-face-bone,
+.xj-rig[data-facing="left"] .xj-tie-bone {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xj-breath-bone,
+  .xj-body-bone,
+  .xj-face-bone,
+  .xj-wing-bone,
+  .xj-tie-bone {
+    will-change: auto;
+  }
+}

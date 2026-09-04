@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <script src="vendor/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/character/rig/xiaojiu-rig.css?v=1.2.0">
+    <script src="assets/character/rig/xiaojiu-rig.js?v=1.2.0"></script>
+    <script src="assets/character/rig/xiaojiu-preset.js?v=assembly-3"></script>
+    <script src="assets/audio/lesson-01-timing.js?v=voice-1"></script>
+    <script src="assets/layout/course-layout.js?v=layout-2"></script>
+    <script src="assets/layout/course-layout-preset.js?v=layout-2"></script>
+    <style>
+      @font-face { font-family: "Finance Sans"; src: local("PingFang SC"); }
+      @font-face { font-family: "Finance Hand"; src: local("Kaiti SC"); }
+      @font-face { font-family: "Microsoft YaHei"; src: local("Microsoft YaHei"); }
+      @font-face { font-family: "Kaiti SC"; src: local("Kaiti SC"); }
+      :root {
+        --paper: #f8f6f2;
+        --paper-hi: #fffdf8;
+        --ink: #1a2744;
+        --ink-soft: #495b7d;
+        --gold: #f5c542;
+        --gold-dark: #c49b2a;
+        --red: #e75a4d;
+        --green: #2f9d68;
+        --wash-blue: #dce8f2;
+        --wash-gold: #f7e8a5;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--paper); }
+      body { color: var(--ink); font-family: "Finance Sans", "Microsoft YaHei", sans-serif; }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--paper);
+      }
+      .paper-texture {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 40;
+        opacity: 0.3;
+        background-image:
+          radial-gradient(circle at 18px 24px, rgba(26,39,68,.10) 0 1px, transparent 1.6px),
+          radial-gradient(circle at 42px 8px, rgba(196,155,42,.11) 0 1px, transparent 1.7px);
+        background-size: 56px 48px, 74px 62px;
+        mix-blend-mode: multiply;
+      }
+      .clip.scene {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        background: var(--paper);
+      }
+      .scene-world { position: absolute; inset: 0; overflow: hidden; }
+      .scene-world::before {
+        content: "";
+        position: absolute;
+        inset: 20px;
+        border: 3px solid rgba(26,39,68,.18);
+        pointer-events: none;
+      }
+      .scene-world::after {
+        content: "";
+        position: absolute;
+        left: 78px;
+        right: 78px;
+        bottom: 76px;
+        height: 3px;
+        background: var(--ink);
+        opacity: .15;
+      }
+      .chrome {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        top: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 20;
+      }
+      .brand {
+        font-size: 24px;
+        font-weight: 850;
+        letter-spacing: .16em;
+        color: var(--ink-soft);
+      }
+      .scene-no {
+        min-width: 154px;
+        padding: 10px 20px;
+        border: 3px solid var(--ink);
+        background: var(--paper-hi);
+        text-align: center;
+        font-size: 24px;
+        font-weight: 900;
+        letter-spacing: .08em;
+        box-shadow: 7px 7px 0 rgba(26,39,68,.12);
+      }
+      .chapter {
+        position: absolute;
+        left: 76px;
+        top: 116px;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .chapter-dot { width: 18px; height: 18px; background: var(--gold); border: 4px solid var(--ink); transform: rotate(8deg); }
+      .chapter-text { font-size: 28px; font-weight: 900; letter-spacing: .1em; }
+      .hand-title {
+        margin: 0;
+        font-family: "Finance Hand", "Kaiti SC", serif;
+        font-size: 102px;
+        line-height: 1.05;
+        letter-spacing: .04em;
+        font-weight: 800;
+      }
+      .big-number { font-size: 142px; line-height: .92; font-weight: 950; letter-spacing: -.06em; }
+      .keyword { font-size: 38px; font-weight: 900; letter-spacing: .04em; }
+      .micro { font-size: 24px; font-weight: 750; color: var(--ink-soft); letter-spacing: .06em; }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 58px;
+        padding: 10px 26px;
+        border: 3px solid var(--ink);
+        background: var(--paper-hi);
+        font-size: 28px;
+        font-weight: 900;
+        box-shadow: 6px 6px 0 rgba(26,39,68,.11);
+      }
+      .wash {
+        position: absolute;
+        border: 4px solid rgba(26,39,68,.18);
+        opacity: .72;
+        filter: url(#roughen);
+      }
+      .wash.blue { background: var(--wash-blue); }
+      .wash.gold { background: var(--wash-gold); }
+      .ghost-number {
+        position: absolute;
+        font-size: 330px;
+        line-height: 1;
+        font-weight: 950;
+        color: var(--ink);
+        opacity: .055;
+        letter-spacing: -.08em;
+      }
+      .doodle-line {
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 11;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: url(#roughen);
+      }
+      .doodle-thin { stroke-width: 6; }
+      .doodle-gold { stroke: var(--gold-dark); }
+      .doodle-green { stroke: var(--green); }
+      .doodle-red { stroke: var(--red); }
+      [data-draw] { stroke-dasharray: 1; stroke-dashoffset: 1; }
+      [data-reveal], [data-step], [data-pop], [data-stamp], [data-character] { opacity: 0; }
+      [data-reveal], [data-step], [data-pop], [data-stamp] { display: block; }
+      .bird-wrap {
+        position: absolute;
+        width: 370px;
+        height: 370px;
+        z-index: 12;
+      }
+      .bird-rig-scale {
+        position: absolute;
+        left: -1px;
+        top: 10px;
+        width: 600px;
+        height: 560px;
+        transform: scale(.62);
+        transform-origin: left top;
+      }
+      .bird-rig {
+        position: absolute;
+        inset: 0;
+      }
+      .coin {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 150px;
+        height: 150px;
+        border: 10px solid var(--ink);
+        border-radius: 50%;
+        background: var(--gold);
+        color: var(--ink);
+        font-size: 50px;
+        font-weight: 950;
+        box-shadow: inset -14px -12px 0 rgba(196,155,42,.34), 12px 15px 0 rgba(26,39,68,.12);
+      }
+      .coin.small { width: 78px; height: 78px; border-width: 7px; font-size: 27px; box-shadow: inset -8px -7px 0 rgba(196,155,42,.34), 7px 8px 0 rgba(26,39,68,.12); }
+      .ledger {
+        position: absolute;
+        inset: 176px 82px 112px;
+        background-image: linear-gradient(rgba(73,91,125,.12) 3px, transparent 3px), linear-gradient(90deg, rgba(73,91,125,.10) 3px, transparent 3px);
+        background-size: 82px 82px;
+        opacity: .72;
+      }
+      .footer-note {
+        position: absolute;
+        left: 82px;
+        right: 82px;
+        bottom: 34px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--ink-soft);
+        letter-spacing: .08em;
+        z-index: 20;
+      }
+
+      /* S01 */
+      #s01 .title-block { position: absolute; left: 120px; top: 210px; width: 780px; z-index: 5; }
+      #s01 .title-block .micro { margin-bottom: 20px; }
+      #s01 .title-block .hand-title { max-width: 760px; }
+      #s01 .title-underline { width: 650px; height: 80px; margin-top: 8px; }
+      #s01 .fork { position: absolute; left: 720px; top: 270px; width: 850px; height: 590px; }
+      #s01 .hero-coin { position: absolute; left: 876px; top: 370px; z-index: 8; }
+      #s01 .choice-now { position: absolute; left: 750px; top: 760px; color: var(--red); }
+      #s01 .choice-later { position: absolute; left: 1254px; top: 760px; color: var(--green); }
+      #s01 .bird-wrap { right: 66px; bottom: 76px; transform: scale(.92); }
+      #s01 .wash.one { left: -100px; bottom: 105px; width: 500px; height: 190px; transform: rotate(-4deg); }
+      #s01 .ghost-number { right: 102px; top: 126px; }
+
+      /* S02 */
+      #s02 .experiment { position: absolute; left: 112px; top: 214px; width: 1190px; height: 700px; }
+      #s02 .jar { position: absolute; left: 430px; top: 212px; width: 340px; height: 320px; }
+      #s02 .jar .coin { position: absolute; left: 94px; top: 48px; }
+      #s02 .factor { position: absolute; width: 280px; min-height: 140px; border: 5px solid var(--ink); background: var(--paper-hi); padding: 22px; box-shadow: 9px 10px 0 rgba(26,39,68,.12); }
+      #s02 .factor strong { display: block; font-size: 42px; margin-bottom: 7px; }
+      #s02 .factor span { font-size: 25px; font-weight: 750; color: var(--ink-soft); }
+      #s02 .factor.principal { left: 20px; top: 58px; transform: rotate(-2deg); }
+      #s02 .factor.rate { right: 22px; top: 42px; transform: rotate(2deg); }
+      #s02 .factor.time { right: 38px; bottom: 48px; transform: rotate(-1deg); }
+      #s02 .result { position: absolute; left: 72px; bottom: 48px; display: flex; align-items: center; gap: 24px; }
+      #s02 .result .big-number { color: var(--green); font-size: 104px; }
+      #s02 .bird-wrap { right: 88px; bottom: 92px; }
+      #s02 .wash.one { right: -70px; top: 210px; width: 640px; height: 300px; transform: rotate(5deg); }
+
+      /* S03 */
+      #s03 .ghost-number { left: 86px; top: 160px; }
+      #s03 .simple-title { position: absolute; left: 110px; top: 205px; width: 510px; display: flex; flex-direction: column; gap: 28px; }
+      #s03 .simple-title .big-number { font-size: 112px; color: var(--red); }
+      #s03 .chart-wrap { position: absolute; left: 560px; top: 205px; width: 1030px; height: 650px; }
+      #s03 .chart-labels { position: absolute; inset: 0; }
+      #s03 .chart-label { position: absolute; width: 110px; text-align: center; font-size: 27px; font-weight: 900; }
+      #s03 .chart-label b { display: block; font-size: 38px; }
+      #s03 .bird-wrap { right: 34px; bottom: 54px; transform: scale(.7); transform-origin: right bottom; }
+      #s03 .wash.one { left: 510px; top: 170px; width: 1140px; height: 710px; transform: rotate(-1deg); opacity: .42; }
+
+      /* S04 */
+      #s04 .compound-title { position: absolute; left: 100px; top: 190px; width: 520px; z-index: 5; }
+      #s04 .compound-title .big-number { margin-top: 22px; color: var(--green); font-size: 104px; }
+      #s04 .snowball { position: absolute; left: 520px; top: 180px; width: 1080px; height: 690px; }
+      #s04 .snow-node { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 26px; font-weight: 900; }
+      #s04 .snow-node .coin { transform-origin: center; }
+      #s04 .snow-node.n1 { left: 20px; bottom: 52px; }
+      #s04 .snow-node.n2 { left: 280px; bottom: 102px; }
+      #s04 .snow-node.n3 { left: 540px; bottom: 190px; }
+      #s04 .snow-node.n4 { left: 806px; bottom: 310px; }
+      #s04 .return-loop { position: absolute; left: 210px; top: 76px; width: 530px; height: 280px; }
+      #s04 .bird-wrap { right: 26px; top: 146px; transform: scale(.68); transform-origin: right top; }
+      #s04 .wash.one { right: -90px; bottom: 60px; width: 930px; height: 460px; transform: rotate(-4deg); }
+
+      /* S05 */
+      #s05 .timeline-title { position: absolute; left: 100px; top: 180px; width: 660px; }
+      #s05 .formula { margin-top: 34px; font-size: 52px; font-weight: 950; letter-spacing: .02em; }
+      #s05 .formula em { color: var(--green); font-style: normal; }
+      #s05 .ten-chart { position: absolute; left: 650px; top: 190px; width: 1040px; height: 650px; }
+      #s05 .stamp259 { position: absolute; right: 160px; top: 220px; width: 390px; height: 230px; border: 12px double var(--red); background: var(--paper-hi); display: flex; flex-direction: column; align-items: center; justify-content: center; transform: rotate(-5deg); box-shadow: 12px 14px 0 rgba(231,90,77,.13); }
+      #s05 .stamp259 strong { font-size: 92px; line-height: 1; color: var(--red); }
+      #s05 .stamp259 span { font-size: 28px; font-weight: 900; margin-top: 15px; }
+      #s05 .warning { position: absolute; left: 104px; bottom: 150px; width: 580px; padding: 24px 30px; border-left: 9px solid var(--gold-dark); background: rgba(247,232,165,.65); font-size: 26px; font-weight: 850; line-height: 1.45; }
+      #s05 .bird-wrap { right: 30px; bottom: 40px; transform: scale(.64); transform-origin: right bottom; }
+
+      /* S06 */
+      #s06 .time-title { position: absolute; left: 106px; top: 185px; width: 560px; display: flex; flex-direction: column; gap: 26px; }
+      #s06 .time-title .big-number { color: #ae8a25; font-size: 120px; }
+      #s06 .race { position: absolute; left: 760px; top: 240px; width: 860px; height: 530px; }
+      #s06 .race-row { position: relative; height: 220px; margin-bottom: 34px; border-bottom: 6px solid var(--ink); }
+      #s06 .race-label { position: absolute; left: 0; top: 16px; width: 170px; font-size: 32px; font-weight: 950; }
+      #s06 .race-label span { display: block; color: var(--ink-soft); font-size: 22px; margin-top: 8px; }
+      #s06 .race-curve { position: absolute; left: 190px; top: 0; width: 650px; height: 210px; }
+      #s06 .clock { position: absolute; left: 110px; bottom: 126px; width: 310px; height: 310px; }
+      #s06 .bird-wrap { left: 342px; bottom: 80px; transform: scale(.72); transform-origin: left bottom; }
+      #s06 .wash.one { right: -70px; top: 190px; width: 1110px; height: 650px; transform: rotate(2deg); opacity: .44; }
+
+      /* S07 */
+      #s07 .action-title { position: absolute; left: 110px; top: 188px; width: 390px; display: flex; flex-direction: column; gap: 32px; }
+      #s07 .actions { position: absolute; left: 500px; right: 410px; top: 240px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+      #s07 .action {
+        min-height: 430px;
+        border: 6px solid var(--ink);
+        background: var(--paper-hi);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        box-shadow: 11px 12px 0 rgba(26,39,68,.12);
+      }
+      #s07 .action:nth-child(2) { transform: translateY(34px) rotate(1deg); }
+      #s07 .action:nth-child(3) { transform: rotate(-1deg); }
+      #s07 .check { width: 110px; height: 110px; border: 8px solid var(--ink); background: var(--wash-gold); display: flex; align-items: center; justify-content: center; font-size: 76px; font-weight: 950; color: #257f56; }
+      #s07 .action strong { font-size: 42px; }
+      #s07 .action span { font-size: 24px; font-weight: 800; color: var(--ink-soft); }
+      #s07 .crossout { position: absolute; left: 606px; bottom: 112px; font-size: 28px; font-weight: 900; color: var(--red); }
+      #s07 .bird-wrap { right: 42px; bottom: 74px; transform: scale(.9); transform-origin: right bottom; }
+
+      /* S08 */
+      #s08 .summary-lock { position: absolute; left: 120px; top: 244px; width: 1200px; }
+      #s08 .summary-lock .formula-final { margin-top: 45px; display: flex; align-items: center; gap: 24px; font-size: 55px; font-weight: 950; }
+      #s08 .formula-final .term { padding: 16px 22px; border-bottom: 7px solid var(--gold-dark); }
+      #s08 .next { margin-top: 54px; display: inline-flex; align-items: center; gap: 22px; font-size: 30px; font-weight: 850; color: var(--ink-soft); }
+      #s08 .next b { color: #287f56; font-size: 38px; }
+      #s08 .bird-wrap { right: 80px; bottom: 92px; }
+      #s08 .wash.one { left: -60px; bottom: 62px; width: 880px; height: 320px; transform: rotate(-3deg); }
+      #s08 .ghost-number { right: 230px; top: 124px; font-size: 260px; }
+
+      #global-progress { position: absolute; z-index: 70; left: 0; right: 0; top: 0; height: 14px; background: rgba(26,39,68,.13); }
+      #progress-fill { width: 100%; height: 100%; background: var(--gold); transform-origin: left center; }
+      #paper-wipe { position: absolute; inset: 0; z-index: 80; background: var(--ink); opacity: 0; pointer-events: none; }
+      #paper-wipe .wipe-paper { position: absolute; inset: 0 0 0 24%; background: var(--paper-hi); clip-path: polygon(11% 0,100% 0,100% 100%,0 100%); }
+      #paper-wipe .wipe-feather { position: absolute; left: 43%; top: 43%; color: var(--gold); font-family: "Finance Hand", serif; font-size: 88px; font-weight: 800; transform: rotate(-7deg); }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-8cvg" id="root" data-composition-id="main" data-start="0" data-duration="173.662" data-width="1920" data-height="1080">
+      <audio data-hf-id="hf-4xwl" id="lesson-01-voiceover" src="assets/audio/lesson-01-voiceover.mp3" data-start="0" data-duration="173.662" data-track-index="10" data-volume="1"></audio>
+      <svg data-hf-id="hf-30au" width="0" height="0" aria-hidden="true" style="position:absolute">
+        <defs data-hf-id="hf-mh0t">
+          <filter data-hf-id="hf-g9au" id="roughen">
+            <feturbulence data-hf-id="hf-y9i1" type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="17" result="noise" />
+            <fedisplacementmap data-hf-id="hf-tu41" in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+      </svg>
+
+      <section data-hf-id="hf-98vd" id="s01" class="clip scene" data-start="0" data-duration="16.458" data-track-index="0" data-step-gap="2.6">
+        <div data-hf-id="hf-2d7r" class="scene-world">
+          <div data-hf-id="hf-xyev" class="wash gold one ambient-drift"></div><div data-hf-id="hf-7uhu" class="ghost-number ambient-drift">100</div>
+          <div data-hf-id="hf-6ex2" class="chrome"><span data-hf-id="hf-qfq1" class="brand">INVEST QUEST · 金融小啾课堂</span><span data-hf-id="hf-7mui" class="scene-no">L1 · 01</span></div>
+          <div data-hf-id="hf-p1of" class="chapter"><i data-hf-id="hf-qol5" class="chapter-dot"></i><span data-hf-id="hf-ijl4" class="chapter-text">储蓄与复利</span></div>
+          <div data-hf-id="hf-cgbe" class="title-block">
+            <div data-hf-id="hf-ljim" class="micro" data-reveal="">同样的一百元，两种不同的未来</div>
+            <h1 data-hf-id="hf-8ja1" class="hand-title" data-reveal="">今天花掉，还是留给以后？</h1>
+            <svg data-hf-id="hf-1agu" class="title-underline" viewBox="0 0 650 80"><path data-hf-id="hf-mpyb" pathLength="1" data-draw="" class="doodle-line doodle-gold" d="M20 44 C160 18 272 68 414 39 S555 22 630 42" /></svg>
+          </div>
+          <svg data-hf-id="hf-65jh" class="fork" viewBox="0 0 850 590">
+            <path data-hf-id="hf-i2mi" pathLength="1" data-draw="" class="doodle-line" d="M250 98 C362 188 365 260 256 445" />
+            <path data-hf-id="hf-odeg" pathLength="1" data-draw="" class="doodle-line doodle-green" d="M250 98 C430 174 554 266 655 444" />
+            <path data-hf-id="hf-dtkj" pathLength="1" data-draw="" class="doodle-line doodle-red doodle-thin" d="M204 408 L257 449 L303 397" />
+            <path data-hf-id="hf-7l8r" pathLength="1" data-draw="" class="doodle-line doodle-green doodle-thin" d="M604 395 L658 446 L703 392" />
+          </svg>
+          <div data-hf-id="hf-6fq7" class="coin hero-coin" data-pop="">100</div>
+          <div data-hf-id="hf-zi5d" class="pill choice-now" data-step="">现在花掉</div><div data-hf-id="hf-8pi0" class="pill choice-later" data-step="">留给以后</div>
+          <div data-hf-id="hf-fsi7" class="bird-wrap" data-character="" data-action="wave"><div data-hf-id="hf-vjvm" class="bird-rig-scale"><div data-hf-id="hf-ixxo" class="bird-rig"></div></div></div>
+          <div data-hf-id="hf-9mmq" class="footer-note"><span data-hf-id="hf-al3j">本金 · 收益率 · 时间</span><span data-hf-id="hf-rroc">S01 / 08</span></div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-wzfc" id="s02" class="clip scene" data-start="16.458" data-duration="21.65" data-track-index="0" data-step-gap="3.4">
+        <div data-hf-id="hf-zx1j" class="scene-world">
+          <div data-hf-id="hf-6kc5" class="wash blue one ambient-drift"></div>
+          <div data-hf-id="hf-ujgq" class="chrome"><span data-hf-id="hf-37xp" class="brand">INVEST QUEST · 金融小啾课堂</span><span data-hf-id="hf-c8lm" class="scene-no">三个因素</span></div>
+          <div data-hf-id="hf-hr5r" class="chapter"><i data-hf-id="hf-xbrh" class="chapter-dot"></i><span data-hf-id="hf-ie4w" class="chapter-text">钱为什么可能增长</span></div>
+          <div data-hf-id="hf-rewx" class="experiment">
+            <article data-hf-id="hf-zv9q" class="factor principal" data-step=""><strong data-hf-id="hf-fa9l">本金</strong><span data-hf-id="hf-i57p">最开始放进去的钱</span></article>
+            <article data-hf-id="hf-xrqu" class="factor rate" data-step=""><strong data-hf-id="hf-1mhz">收益率</strong><span data-hf-id="hf-n93e">资金增长的速度</span></article>
+            <article data-hf-id="hf-za0l" class="factor time" data-step=""><strong data-hf-id="hf-nhs0">时间</strong><span data-hf-id="hf-ihyh">增长持续多久</span></article>
+            <svg data-hf-id="hf-0h5z" class="jar" viewBox="0 0 340 320">
+              <path data-hf-id="hf-mgg8" pathLength="1" data-draw="" class="doodle-line" d="M82 64 H258 M104 65 L75 118 V265 Q170 306 265 265 V118 L236 65" />
+              <path data-hf-id="hf-jo8k" pathLength="1" data-draw="" class="doodle-line doodle-thin" d="M118 133 Q170 111 222 133" />
+              <circle data-hf-id="hf-8t24" cx="170" cy="145" r="68" fill="#f5c542" stroke="#1a2744" stroke-width="9" />
+              <text data-hf-id="hf-8pph" x="170" y="163" text-anchor="middle" font-size="48" font-weight="950" fill="#1a2744">100</text>
+            </svg>
+            <svg data-hf-id="hf-ng2u" width="1190" height="700" viewBox="0 0 1190 700" style="position:absolute;inset:0">
+              <path data-hf-id="hf-73ep" pathLength="1" data-draw="" class="doodle-line doodle-thin" d="M285 126 C390 116 418 182 492 247" />
+              <path data-hf-id="hf-js64" pathLength="1" data-draw="" class="doodle-line doodle-thin" d="M898 116 C798 118 760 185 708 248" />
+              <path data-hf-id="hf-84fr" pathLength="1" data-draw="" class="doodle-line doodle-thin" d="M894 538 C790 530 760 468 714 420" />
+            </svg>
+            <div data-hf-id="hf-gkr2" class="result" data-stamp=""><span data-hf-id="hf-v40y" class="big-number">100 + 10</span><span data-hf-id="hf-uw4v" class="keyword">第一年 = 110</span></div>
+          </div>
+          <div data-hf-id="hf-7jfz" class="bird-wrap" data-character="" data-action="teach"><div data-hf-id="hf-l6o4" class="bird-rig-scale"><div data-hf-id="hf-e92c" class="bird-rig"></div></div></div>
+          <div data-hf-id="hf-01zq" class="footer-note"><span data-hf-id="hf-klbe">新产生的10元，下一年参加计算吗？</span><span data-hf-id="hf-c17b">S02 / 08</span></div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-sedg" id="s03" class="clip scene" data-start="38.108" data-duration="22.753" data-track-index="0" data-step-gap="4.4">
+        <div data-hf-id="hf-ziqi" class="scene-world">
+          <div data-hf-id="hf-pwh5" class="wash blue one ambient-drift"></div><div data-hf-id="hf-6glr" class="ghost-number">+10</div>
+          <div data-hf-id="hf-uxrr" class="chrome"><span data-hf-id="hf-4eus" class="brand">INVEST QUEST · 金融小啾课堂</span><span data-hf-id="hf-3q7f" class="scene-no">单利</span></div>
+          <div data-hf-id="hf-hcuq" class="chapter"><i data-hf-id="hf-yiok" class="chapter-dot"></i><span data-hf-id="hf-zvnk" class="chapter-text">每年只按原本金计算</span></div>
+          <div data-hf-id="hf-03uj" class="simple-title"><h1 data-hf-id="hf-cuuy" class="hand-title" data-reveal="">每一步，都一样长</h1><div data-hf-id="hf-5eya" class="big-number" data-stamp="">每年 +10</div><div data-hf-id="hf-am6e" class="micro" data-reveal="">100元本金 · 年收益率10%</div></div>
+          <div data-hf-id="hf-36xh" class="chart-wrap">
+            <svg data-hf-id="hf-f3ou" width="1030" height="650" viewBox="0 0 1030 650">
+              <path data-hf-id="hf-f0hz" pathLength="1" data-draw="" class="doodle-line doodle-thin" d="M80 540 H950 M90 550 V80" />
+              <path data-hf-id="hf-0cmd" pathLength="1" data-draw="" class="doodle-line doodle-red" d="M95 505 L250 425 L405 345 L560 265 L715 185 L870 105" />
+              <g data-hf-id="hf-1kue" fill="#e75a4d" stroke="#1a2744" stroke-width="7">
+                <circle data-hf-id="hf-1pag" cx="95" cy="505" r="15" /><circle data-hf-id="hf-uop6" cx="250" cy="425" r="15" /><circle data-hf-id="hf-78u1" cx="405" cy="345" r="15" /><circle data-hf-id="hf-1pn2" cx="560" cy="265" r="15" /><circle data-hf-id="hf-yd6n" cx="715" cy="185" r="15" /><circle data-hf-id="hf-1hl7" cx="870" cy="105" r="15" />
+              </g>
+            </svg>
+            <div data-hf-id="hf-fh5g" class="chart-labels">
+              <span data-hf-id="hf-43mi" class="chart-label" data-step="" style="left:42px;top:520px"><b data-hf-id="hf-puf0">100</b>第0年</span>
+              <span data-hf-id="hf-0wjh" class="chart-label" data-step="" style="left:197px;top:440px"><b data-hf-id="hf-qm2t">110</b>第1年</span>
+              <span data-hf-id="hf-a5y8" class="chart-label" data-step="" style="left:352px;top:360px"><b data-hf-id="hf-cij2">120</b>第2年</span>
+              <span data-hf-id="hf-xu8o" class="chart-label" data-step="" style="left:507px;top:280px"><b data-hf-id="hf-da6v">130</b>第3年</span>
+              <span data-hf-id="hf-hapz" class="chart-label" data-step="" style="left:662px;top:200px"><b data-hf-id="hf-sz5k">140</b>第4年</span>
+              <span data-hf-id="hf-ji8r" class="chart-label" data-step="" style="left:817px;top:120px"><b data-hf-id="hf-tqtd">150</b>第5年</span>
+            </div>
+          </div>
+          <div data-hf-id="hf-754y" class="bird-wrap" data-character="" data-action="idle"><div data-hf-id="hf-306a" class="bird-rig-scale"><div data-hf-id="hf-d259" class="bird-rig"></div></div></div>
+          <div data-hf-id="hf-0gar" class="footer-note"><span data-hf-id="hf-iu1z">直线增长：计算基础始终是100元</span><span data-hf-id="hf-boxq">S03 / 08</span></div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-xxti" id="s04" class="clip scene" data-start="60.861" data-duration="32.111" data-track-index="0" data-step-gap="4.5">
+        <div data-hf-id="hf-z4fh" class="scene-world">
+          <div data-hf-id="hf-nxx3" class="wash gold one ambient-drift"></div>
+          <div data-hf-id="hf-vc2s" class="chrome"><span data-hf-id="hf-40jr" class="brand">INVEST QUEST · 金融小啾课堂</span><span data-hf-id="hf-yv6b" class="scene-no">复利</span></div>
+          <div data-hf-id="hf-gyjp" class="chapter"><i data-hf-id="hf-y4dj" class="chapter-dot"></i><span data-hf-id="hf-e6yp" class="chapter-text">收益也加入下一轮</span></div>
+          <div data-hf-id="hf-tiiq" class="compound-title"><h1 data-hf-id="hf-881d" class="hand-title" data-reveal="">钱，也会生出新的钱</h1><div data-hf-id="hf-vv6x" class="big-number" data-stamp="">利滚利</div><div data-hf-id="hf-szu2" class="micro" data-reveal="">收益回到本金，计算基础越来越大</div></div>
+          <div data-hf-id="hf-1ia2" class="snowball">
+            <svg data-hf-id="hf-viny" width="1080" height="690" viewBox="0 0 1080 690" style="position:absolute;inset:0">
+              <path data-hf-id="hf-dx78" pathLength="1" data-draw="" class="doodle-line doodle-green" d="M100 570 C330 560 490 490 620 387 S842 150 934 105" />
+              <path data-hf-id="hf-c05e" pathLength="1" data-draw="" class="doodle-line doodle-gold doodle-thin" d="M322 167 C410 58 608 58 692 170 C744 238 705 308 637 314" />
+              <path data-hf-id="hf-flhk" pathLength="1" data-draw="" class="doodle-line doodle-gold doodle-thin" d="M637 314 L667 271 M637 314 L691 318" />
+              <text data-hf-id="hf-qzuk" x="440" y="58" font-size="28" font-weight="900" fill="#495b7d">收益重新投入</text>
+            </svg>
+            <div data-hf-id="hf-gogv" class="snow-node n1" data-step=""><div data-hf-id="hf-zz0h" class="coin small">100</div><span data-hf-id="hf-qisj">第0年</span></div>
+            <div data-hf-id="hf-8a0u" class="snow-node n2" data-step=""><div data-hf-id="hf-u87e" class="coin" style="transform:scale(.68)">110</div><span data-hf-id="hf-vf3m">第1年</span></div>
+            <div data-hf-id="hf-jryp" class="snow-node n3" data-step=""><div data-hf-id="hf-fgpu" class="coin" style="transform:scale(.82)">121</div><span data-hf-id="hf-tyi9">第2年</span></div>
+            <div data-hf-id="hf-k7q0" class="snow-node n4" data-step=""><div data-hf-id="hf-hrr3" class="coin">161</div><span data-hf-id="hf-74ra">第5年</span></div>
+          </div>
+          <div data-hf-id="hf-6qtx" class="bird-wrap" data-character="" data-action="think"><div data-hf-id="hf-9ics" class="bird-rig-scale"><div data-hf-id="hf-dgga" class="bird-rig"></div></div></div>
+          <div data-hf-id="hf-0uls" class="footer-note"><span data-hf-id="hf-qu6f">复利 = 本金和收益一起继续增长</span><span data-hf-id="hf-f3wh">S04 / 08</span></div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-3n0y" id="s05" class="clip scene" data-start="92.972" data-duration="27.028" data-track-index="0" data-step-gap="3.4">
+        <div data-hf-id="hf-1wko" class="scene-world">
+          <div data-hf-id="hf-0w29" class="ledger ambient-drift"></div>
+          <div data-hf-id="hf-vqdt" class="chrome"><span data-hf-id="hf-57gu" class="brand">INVEST QUEST · 金融小啾课堂</span><span data-hf-id="hf-k26y" class="scene-no">十年演示</span></div>
+          <div data-hf-id="hf-jqow" class="chapter"><i data-hf-id="hf-zbam" class="chapter-dot"></i><span data-hf-id="hf-lfeo" class="chapter-text">100元如何变成约259元</span></div>
+          <div data-hf-id="hf-mbzo" class="timeline-title"><h1 data-hf-id="hf-qyj4" class="hand-title" data-reveal="">时间，把曲线慢慢推高</h1><div data-hf-id="hf-hehi" class="formula" data-reveal="">100 ×（1 + 10%）<sup data-hf-id="hf-bdny">10</sup> ≈ <em data-hf-id="hf-54qt">259</em></div></div>
+          <div data-hf-id="hf-azri" class="ten-chart">
+            <svg data-hf-id="hf-blfs" width="1040" height="650" viewBox="0 0 1040 650">
+              <path data-hf-id="hf-11ax" pathLength="1" data-draw="" class="doodle-line doodle-thin" d="M70 540 H980 M82 548 V80" />
+              <path data-hf-id="hf-7y6x" pathLength="1" data-draw="" class="doodle-line doodle-green" d="M90 518 C220 490 290 458 370 420 S520 330 600 266 S750 156 930 92" />
+              <g data-hf-id="hf-9nb1" fill="#f5c542" stroke="#1a2744" stroke-width="7">
+                <circle data-hf-id="hf-ca66" cx="90" cy="518" r="14" /><circle data-hf-id="hf-y3hz" cx="370" cy="420" r="14" /><circle data-hf-id="hf-zu53" cx="600" cy="266" r="14" /><circle data-hf-id="hf-zw3b" cx="930" cy="92" r="20" />
+              </g>
+              <g data-hf-id="hf-qykq" font-family="Finance Sans" font-size="25" font-weight="900" fill="#1a2744">
+                <text data-hf-id="hf-3yqq" x="75" y="590">0年</text><text data-hf-id="hf-rqbt" x="350" y="590">3年</text><text data-hf-id="hf-21z6" x="580" y="590">5年</text><text data-hf-id="hf-c0ja" x="900" y="590">10年</text>
+                <text data-hf-id="hf-vuzo" x="105" y="500">100</text><text data-hf-id="hf-3twp" x="385" y="402">133</text><text data-hf-id="hf-tly4" x="615" y="248">161</text>
+              </g>
+            </svg>
+          </div>
+          <div data-hf-id="hf-lwi2" class="stamp259" data-stamp=""><strong data-hf-id="hf-qyth">约259元</strong><span data-hf-id="hf-o3rq">第10年</span></div>
+          <div data-hf-id="hf-a5ec" class="warning" data-reveal="">10%仅用于数学演示，不代表现实产品会保证这一收益率。</div>
+          <div data-hf-id="hf-9iz4" class="bird-wrap" data-character="" data-action="teach"><div data-hf-id="hf-re4c" class="bird-rig-scale"><div data-hf-id="hf-ffzf" class="bird-rig"></div></div></div>
+          <div data-hf-id="hf-y2gl" class="footer-note"><span data-hf-id="hf-dual">计算示例：收益每年继续投入</span><span data-hf-id="hf-2pew">S05 / 08</span></div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-1qn9" id="s06" class="clip scene" data-start="120" data-duration="24.386" data-track-index="0" data-step-gap="5.2">
+        <div data-hf-id="hf-1i9n" class="scene-world">
+          <div data-hf-id="hf-r3e8" class="wash blue one ambient-drift"></div>
+          <div data-hf-id="hf-w4ou" class="chrome"><span data-hf-id="hf-4t5t" class="brand">INVEST QUEST · 金融小啾课堂</span><span data-hf-id="hf-x1dg" class="scene-no">关键因素</span></div>
+          <div data-hf-id="hf-jcdv" class="chapter"><i data-hf-id="hf-ywzl" class="chapter-dot"></i><span data-hf-id="hf-iggu" class="chapter-text">为什么越早开始越有利</span></div>
+          <div data-hf-id="hf-5s8u" class="time-title"><h1 data-hf-id="hf-5fke" class="hand-title" data-reveal="">复利最需要的朋友</h1><div data-hf-id="hf-96vb" class="big-number" data-stamp="">时间</div><div data-hf-id="hf-a67c" class="micro" data-reveal="">前几年差别不大，后来才逐渐加速</div></div>
+          <svg data-hf-id="hf-p1iw" class="clock" viewBox="0 0 310 310">
+            <circle data-hf-id="hf-pdcw" cx="155" cy="155" r="126" fill="#fffdf8" stroke="#1a2744" stroke-width="10" />
+            <path data-hf-id="hf-n33x" pathLength="1" data-draw="" class="doodle-line doodle-thin" d="M155 54 V78 M155 232 V256 M54 155 H78 M232 155 H256" />
+            <path data-hf-id="hf-ktmn" id="clock-hand" class="doodle-line doodle-gold" d="M155 155 L155 82 M155 155 L218 190" />
+            <circle data-hf-id="hf-12jh" cx="155" cy="155" r="14" fill="#f5c542" stroke="#1a2744" stroke-width="7" />
+          </svg>
+          <div data-hf-id="hf-6dr3" class="race">
+            <div data-hf-id="hf-n6do" class="race-row" data-step=""><div data-hf-id="hf-ty9l" class="race-label">早点开始<span data-hf-id="hf-a0xa">时间更长</span></div><svg data-hf-id="hf-w55d" class="race-curve" viewBox="0 0 720 210"><path data-hf-id="hf-gmdg" pathLength="1" data-draw="" class="doodle-line doodle-green" d="M15 188 C190 178 330 145 440 101 S602 40 700 19" /></svg></div>
+            <div data-hf-id="hf-yk9w" class="race-row" data-step=""><div data-hf-id="hf-2zfa" class="race-label">晚点开始<span data-hf-id="hf-4cwo">时间更短</span></div><svg data-hf-id="hf-hsw5" class="race-curve" viewBox="0 0 720 210"><path data-hf-id="hf-gw7a" pathLength="1" data-draw="" class="doodle-line doodle-red" d="M15 188 C280 184 435 163 548 129 S646 92 700 72" /></svg></div>
+          </div>
+          <div data-hf-id="hf-94o3" class="bird-wrap" data-character="" data-action="think"><div data-hf-id="hf-4t1f" class="bird-rig-scale"><div data-hf-id="hf-fuag" class="bird-rig"></div></div></div>
+          <div data-hf-id="hf-ygrm" class="footer-note"><span data-hf-id="hf-w0cg">越早开始，时间越可能站在你这一边</span><span data-hf-id="hf-g3z7">S06 / 08</span></div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-j3p4" id="s07" class="clip scene" data-start="144.386" data-duration="20.18" data-track-index="0" data-step-gap="3.8">
+        <div data-hf-id="hf-13ym" class="scene-world">
+          <div data-hf-id="hf-wizv" class="chrome"><span data-hf-id="hf-602w" class="brand">INVEST QUEST · 金融小啾课堂</span><span data-hf-id="hf-umwz" class="scene-no">行动清单</span></div>
+          <div data-hf-id="hf-iy2u" class="chapter"><i data-hf-id="hf-03wo" class="chapter-dot"></i><span data-hf-id="hf-ai0l" class="chapter-text">让复利真正发挥作用</span></div>
+          <div data-hf-id="hf-3u7v" class="action-title"><h1 data-hf-id="hf-pnt2" class="hand-title" data-reveal="">三件简单，但重要的事</h1><div style="clip-path: inset(0px)" data-hf-id="hf-y8bn" class="micro" data-reveal="">复利不是短期投机技巧</div></div>
+          <div data-hf-id="hf-zgc1" class="actions">
+            <article data-hf-id="hf-sv8x" class="action" data-step=""><div data-hf-id="hf-d02p" class="check">✓</div><strong data-hf-id="hf-gzzp">尽早开始</strong><span data-hf-id="hf-0rov">让时间更长</span></article>
+            <article data-hf-id="hf-ceud" class="action" data-step=""><div data-hf-id="hf-rbg5" class="check">✓</div><strong data-hf-id="hf-c34v">收益再投入</strong><span data-hf-id="hf-kedz">让收益继续增长</span></article>
+            <article data-hf-id="hf-dlrg" class="action" data-step=""><div data-hf-id="hf-sid8" class="check">✓</div><strong data-hf-id="hf-r90t">长期坚持</strong><span data-hf-id="hf-u01k">不中断积累</span></article>
+          </div>
+          <div data-hf-id="hf-d2fd" class="crossout" data-stamp="">频繁进出　✕</div>
+          <div data-hf-id="hf-8qd2" class="bird-wrap" data-character="" data-action="nod"><div data-hf-id="hf-jefb" class="bird-rig-scale"><div data-hf-id="hf-endd" class="bird-rig"></div></div></div>
+          <div data-hf-id="hf-yv2n" class="footer-note"><span data-hf-id="hf-du2w">尽早 · 再投入 · 长期</span><span data-hf-id="hf-5zui">S07 / 08</span></div>
+        </div>
+      </section>
+
+      <section data-hf-id="hf-1chl" id="s08" class="clip scene" data-start="164.566" data-duration="9.096" data-track-index="0" data-step-gap="1.4">
+        <div data-hf-id="hf-0pnl" class="scene-world">
+          <div data-hf-id="hf-njm2" class="wash gold one ambient-drift"></div><div data-hf-id="hf-txa2" class="ghost-number">L1</div>
+          <div data-hf-id="hf-wxaw" class="chrome"><span data-hf-id="hf-5lrv" class="brand">INVEST QUEST · 金融小啾课堂</span><span data-hf-id="hf-bma5" class="scene-no">本课总结</span></div>
+          <div data-hf-id="hf-ige0" class="summary-lock">
+            <h1 data-hf-id="hf-9wi1" class="hand-title" data-reveal="">复利，是时间参与的增长机制</h1>
+            <div data-hf-id="hf-wxwc" class="formula-final" data-stamp=""><span data-hf-id="hf-wqhk" class="term">本金</span><b data-hf-id="hf-yz6y">＋</b><span data-hf-id="hf-gu8o" class="term">收益再投入</span><b data-hf-id="hf-6esu">＋</b><span data-hf-id="hf-93z1" class="term">时间</span></div>
+            <div data-hf-id="hf-5epe" class="next" data-reveal=""><span data-hf-id="hf-nr4f">短期随时可能要用的钱怎么办？</span><b data-hf-id="hf-dip0">下一课：货币基金入门 →</b></div>
+          </div>
+          <div data-hf-id="hf-8c21" class="bird-wrap" data-character="" data-action="wave"><div data-hf-id="hf-u6h2" class="bird-rig-scale"><div data-hf-id="hf-f1oe" class="bird-rig"></div></div></div>
+          <div data-hf-id="hf-z9do" class="footer-note"><span data-hf-id="hf-643w">完成 L1 · 01</span><span data-hf-id="hf-lvvh">S08 / 08</span></div>
+        </div>
+      </section>
+
+      <div data-hf-id="hf-1rc4" id="global-progress"><div data-hf-id="hf-c4bu" id="progress-fill"></div></div>
+      <div data-hf-id="hf-ozoz" id="paper-wipe" data-layout-ignore=""><div data-hf-id="hf-ggp0" class="wipe-paper"></div><div data-hf-id="hf-k4k6" class="wipe-feather">翻到下一页</div></div>
+      <div data-hf-id="hf-qmgc" class="paper-texture"></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__courseLayoutBaseline = CourseLayout.capture(document);
+      window.__courseLayout = CourseLayout.apply(document, window.COURSE_LAYOUT_PRESET, window.__courseLayoutBaseline);
+      gsap.set("[data-hf-id=\"hf-1ia2\"]", { x: 42, y: -34 });
+      gsap.set("[data-hf-id=\"hf-vv6x\"]", { x: -5, y: -23 });
+      gsap.set("[data-hf-id=\"hf-ceud\"]", { x: -155, y: 292 });
+      gsap.set("[data-hf-id=\"hf-dlrg\"]", { x: -25, y: 281 });
+      gsap.set("[data-hf-id=\"hf-ceud\"]", { x: -141, y: 283 });
+      gsap.set("[data-hf-id=\"hf-zgc1\"]", { x: -13, y: 26 });
+      gsap.set("[data-hf-id=\"hf-y8bn\"]", { x: 60, y: 0 });
+      const tl = gsap.timeline({ paused: true, defaults: { duration: 0.55, ease: "power3.out" } });
+      const characterRigs = new Map();
+      document.querySelectorAll("[data-character]").forEach((character, index) => {
+        const scene = character.closest(".scene");
+        const rig = XiaojiuRig.mount(character.querySelector(".bird-rig"), {
+          assetBase: "assets/character/rig/parts/",
+          idPrefix: `lesson01-${scene.id}-${index}`,
+          assemblyPreset: window.XIAOJIU_ASSEMBLY_PRESET
+        });
+        characterRigs.set(scene.id, rig);
+      });
+      const audioTiming = window.LESSON_01_AUDIO_TIMING;
+      const timelineDuration = audioTiming.duration;
+      const sceneDefs = audioTiming.scenes;
+      const motionCues = {
+        s01: { reveal: [0.35, 2.99], draw: [3.1, 3.25, 3.6, 4.2], pop: [0.65], step: [3, 4.2], action: 0.6 },
+        s02: { draw: [17, 17.2, 17.4, 20, 27], step: [17, 19.82, 26.79], stamp: [22.6], action: 17.4 },
+        s03: { reveal: [39, 42.23], draw: [42.23, 45.1], stamp: [48.13], step: [39.4, 50.66, 52.2, 53.4, 54.56, 55.5], action: 39 },
+        s04: { reveal: [61.3, 65.76], draw: [62.66, 65.76, 67], step: [62.66, 69.32, 72.89, 77.32], stamp: [82.76], action: 61.6 },
+        s05: { reveal: [93.35, 100.89, 107.28], draw: [97.43, 100.89], stamp: [104.56], action: 100.5 },
+        s06: { reveal: [120.33, 125.86], draw: [122.73, 129.36, 129.8], step: [129.36, 135.46], stamp: [122.73], action: 122.5 },
+        s07: { reveal: [144.72, 158.26], step: [147.34, 148.76, 150], stamp: [152.26], action: 147.2 },
+        s08: { reveal: [164.8, 167.93], stamp: [166.5], action: 165.4 }
+      };
+      const layoutMotion = new WeakMap();
+      document.querySelectorAll(".scene [data-hf-id]").forEach(node => {
+        layoutMotion.set(node, {
+          x: Number(gsap.getProperty(node, "x")) || 0,
+          y: Number(gsap.getProperty(node, "y")) || 0,
+          scale: Number(gsap.getProperty(node, "scaleX")) || 1,
+          rotation: Number(gsap.getProperty(node, "rotation")) || 0
+        });
+      });
+      const layoutValue = (property, offset = 0) => (_index, target) =>
+        (layoutMotion.get(target)?.[property] ?? (property === "scale" ? 1 : 0)) + offset;
+      const layoutScale = factor => (_index, target) =>
+        (layoutMotion.get(target)?.scale ?? 1) * factor;
+
+      const addSpeechCadence = (rig, sceneId) => {
+        audioTiming.speech
+          .filter(phrase => phrase.scene === sceneId)
+          .forEach(phrase => {
+            XiaojiuRig.addAction(tl, rig, "talk", {
+              at: phrase.start,
+              duration: phrase.end - phrase.start
+            });
+          });
+      };
+
+      const addBlinkCadence = (rig, start, end, patternOffset = 0) => {
+        const blinkIntervals = [4.8, 5.6, 4.95, 6.1];
+        let cursor = start;
+        let blinkIndex = patternOffset;
+        while (cursor < end - 1.25) {
+          XiaojiuRig.addAction(tl, rig, "blink", { at: cursor, duration: 1.4 });
+          cursor += blinkIntervals[blinkIndex % blinkIntervals.length];
+          blinkIndex += 1;
+        }
+      };
+
+      const cueTime = (sceneId, kind, index, fallback) =>
+        motionCues[sceneId]?.[kind]?.[index] ?? fallback;
+
+      const animateScene = ({ id, start, duration }, index) => {
+        const scene = document.getElementById(id);
+        const reveals = scene.querySelectorAll("[data-reveal]");
+        const paths = scene.querySelectorAll("[data-draw]");
+        const pops = scene.querySelectorAll("[data-pop]");
+        const steps = scene.querySelectorAll("[data-step]");
+        const stamps = scene.querySelectorAll("[data-stamp]");
+        const character = scene.querySelector("[data-character]");
+        const drifters = scene.querySelectorAll(".ambient-drift");
+        const gap = Number(scene.dataset.stepGap || 3.2);
+
+        Array.from(reveals).forEach((node, revealIndex) => {
+          tl.fromTo(node,
+            { autoAlpha: 0, x: layoutValue("x", index % 2 === 0 ? -46 : 46), y: layoutValue("y", 18) },
+            { autoAlpha: 1, x: layoutValue("x"), y: layoutValue("y"), duration: 0.82, ease: "expo.out", immediateRender: false },
+            cueTime(id, "reveal", revealIndex, start + 0.25 + revealIndex * 0.22)
+          );
+        });
+        Array.from(paths).forEach((node, pathIndex) => {
+          tl.fromTo(node,
+            { strokeDashoffset: 1 },
+            { strokeDashoffset: 0, duration: Math.min(1.6, Math.max(0.9, duration * 0.055)), ease: "power1.inOut", immediateRender: false },
+            cueTime(id, "draw", pathIndex, start + 0.6 + pathIndex * 0.17)
+          );
+        });
+        Array.from(pops).forEach((node, popIndex) => {
+          tl.fromTo(node,
+            { autoAlpha: 0, scale: layoutScale(0.38), rotation: layoutValue("rotation", -12) },
+            { autoAlpha: 1, scale: layoutScale(1), rotation: layoutValue("rotation"), duration: 0.72, ease: "back.out(1.8)", immediateRender: false },
+            cueTime(id, "pop", popIndex, start + 1.2 + popIndex * 0.16)
+          );
+        });
+        Array.from(steps).forEach((node, stepIndex) => {
+          tl.fromTo(node,
+            { autoAlpha: 0, y: layoutValue("y", 44), rotation: layoutValue("rotation", index % 2 === 0 ? -2 : 2) },
+            { autoAlpha: 1, y: layoutValue("y"), rotation: layoutValue("rotation"), duration: 0.62, ease: "power3.out", immediateRender: false },
+            cueTime(id, "step", stepIndex, start + 2.6 + stepIndex * gap)
+          );
+        });
+        Array.from(stamps).forEach((node, stampIndex) => {
+          tl.fromTo(node,
+            { autoAlpha: 0, scale: layoutScale(1.38), rotation: layoutValue("rotation", -7) },
+            { autoAlpha: 1, scale: layoutScale(1), rotation: layoutValue("rotation"), duration: 0.38, ease: "power4.out", immediateRender: false },
+            cueTime(id, "stamp", stampIndex, start + Math.min(duration - 5.2, 8.2) + stampIndex * 0.2)
+          );
+        });
+        if (character) {
+          const sprite = character.querySelector(".bird-rig-scale");
+          const rig = characterRigs.get(id);
+          tl.fromTo(character,
+            { autoAlpha: 0, x: layoutValue("x", index % 2 === 0 ? 120 : -120), y: layoutValue("y", 24), rotation: layoutValue("rotation", index % 2 === 0 ? 4 : -4) },
+            { autoAlpha: 1, x: layoutValue("x"), y: layoutValue("y"), rotation: layoutValue("rotation"), duration: 0.86, ease: "back.out(1.35)", immediateRender: false },
+            start + 1.05
+          );
+          const repeatCount = Math.max(1, Math.floor((duration - 3) / 3.2) * 2 - 1);
+          tl.fromTo(sprite,
+            { y: 0, rotation: -0.6 },
+            { y: -10, rotation: 0.8, duration: 1.6, repeat: repeatCount, yoyo: true, ease: "sine.inOut", immediateRender: false },
+            start + 2
+          );
+          const action = character.dataset.action || "idle";
+          const actionDuration = { idle: Math.max(2, duration - 2.4), blink: 1.4, talk: 3.2, teach: 3.5, think: 3.4, surprise: 3.2, nod: 3, wave: 3.6 }[action];
+          const actionAt = motionCues[id]?.action ?? start + 1.35;
+          XiaojiuRig.addAction(tl, rig, action, { at: actionAt, duration: actionDuration });
+          if (action !== "idle" && duration > 8) {
+            const idleAt = actionAt + actionDuration + 0.2;
+            XiaojiuRig.addAction(tl, rig, "idle", { at: idleAt, duration: Math.max(2, start + duration - idleAt - 0.5) });
+          }
+          addSpeechCadence(rig, id);
+          const blinkLead = action === "teach" || action === "idle" ? 2.35 : 5.15;
+          addBlinkCadence(rig, start + blinkLead, start + duration - 0.65, index);
+        }
+        if (drifters.length) {
+          const repeatCount = Math.max(1, Math.floor((duration - 2) / 4.4) * 2 - 1);
+          tl.fromTo(drifters,
+            { x: layoutValue("x", index % 2 === 0 ? -10 : 10), y: layoutValue("y") },
+            { x: layoutValue("x", index % 2 === 0 ? 12 : -12), y: layoutValue("y", -8), duration: 2.2, repeat: repeatCount, yoyo: true, ease: "sine.inOut", immediateRender: false },
+            start + 0.4
+          );
+        }
+      };
+
+      sceneDefs.forEach(animateScene);
+
+      tl.fromTo("#progress-fill", { scaleX: 0 }, { scaleX: 1, duration: timelineDuration, ease: "none", immediateRender: false }, 0);
+      tl.to("#clock-hand", { rotation: 720, svgOrigin: "155 155", duration: 19.5, ease: "none" }, 122.73);
+
+      const wipe = document.getElementById("paper-wipe");
+      sceneDefs.slice(1).forEach(({ start }) => {
+        tl.fromTo(wipe,
+          { autoAlpha: 1, xPercent: 100 },
+          { autoAlpha: 1, xPercent: 0, duration: 0.2, ease: "power3.in", immediateRender: false },
+          start - 0.2
+        );
+        tl.to(wipe, { xPercent: -100, duration: 0.25, ease: "power3.out" }, start + 0.01);
+        tl.set(wipe, { autoAlpha: 0 }, start + 0.28);
+        tl.to("[data-hf-id=\"hf-881d\"]", { keyframes: { "0%": { width: 553, height: 341 }, "100%": { width: 553, height: 341 } }, duration: 0.82 }, 0);
+        tl.to("[data-hf-id=\"hf-hehi\"]", { keyframes: { "0%": {
+          width: 562,
+          height: 132,
+          x: -13,
+          y: 14
+        }, "0.5%": {
+          width: 562,
+          height: 132,
+          x: -13,
+          y: 14
+        }, "100%": { width: 496, height: 117, x: -13, y: 31 } }, duration: 155.733 }, 0);
+        tl.to("[data-hf-id=\"hf-nxx3\"]", { keyframes: { "0%": { width: 498, height: 246 }, "100%": { width: 498, height: 246 } }, duration: 2.2 }, 0);
+        tl.set("[data-hf-id=\"hf-zgc1\"]", { width: 996, height: 424, immediateRender: true }, 0);
+        tl.to("[data-hf-id=\"hf-y8bn\"]", { keyframes: { "0%": { width: 390, height: 49 }, "100%": { width: 585, height: 49 } }, duration: 0.82 }, 0);
+      });
+
+      window.__timelines.main = tl;
+
+      const layoutEditorParams = new URLSearchParams(window.location.search);
+      if (layoutEditorParams.get("layoutEdit") === "1") {
+        const requestedScene = layoutEditorParams.get("scene");
+        const definition = sceneDefs.find(entry => entry.id === requestedScene) || sceneDefs[0];
+        const editTime = definition.start + Math.max(1.5, definition.duration - 1.4);
+        tl.seek(editTime, false).pause();
+        document.querySelectorAll(".scene").forEach(scene => {
+          scene.style.display = scene.id === definition.id ? "block" : "none";
+          scene.style.visibility = scene.id === definition.id ? "visible" : "hidden";
+        });
+        document.querySelector("#global-progress").style.display = "none";
+        document.querySelector("#paper-wipe").style.display = "none";
+        document.documentElement.dataset.layoutEditorScene = definition.id;
+        window.__courseLayoutEditorReady = true;
+        window.dispatchEvent(new CustomEvent("course-layout-ready", {detail: {sceneId: definition.id, editTime}}));
+      }
+    </script>
+  </body>
+</html>

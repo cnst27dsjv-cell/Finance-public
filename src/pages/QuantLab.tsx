@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStrategyStore } from '../stores/strategyStore'
-import { useUserStore } from '../stores/userStore'
 import './QuantLab.css'
 
 function QuantLab() {
@@ -32,8 +31,8 @@ function QuantLab() {
   const [isOptimizing, setIsOptimizing] = useState(false)
   const [showParams, setShowParams] = useState(false)
 
-  const { hasCompletedCourse } = useUserStore()
-  const isUnlocked = ['L3-1', 'L3-2', 'L3-3', 'L3-4'].every(id => hasCompletedCourse(id))
+  // TODO: 本地调试用，临时强制解锁
+  const isUnlocked = true // ['L3-1', 'L3-2', 'L3-3', 'L3-4'].every(id => hasCompletedCourse(id))
 
   const handleSaveNewStrategy = () => {
     if (newStrategyName && currentStrategyCode) {

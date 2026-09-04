@@ -1,0 +1,57 @@
+{
+  "name": "xiaojiu-teacher-rig",
+  "version": "1.2.0",
+  "coordinateSystem": {
+    "width": 600,
+    "height": 560,
+    "origin": "center-bottom"
+  },
+  "parts": {
+    "body": "parts/body-clean.png",
+    "wings": [
+      "parts/wing-folded-a.png",
+      "parts/wing-folded-b.png",
+      "parts/wing-raised-a.png",
+      "parts/wing-raised-b.png",
+      "parts/wing-point.png",
+      "parts/wing-fist.png"
+    ],
+    "eyes": [
+      "parts/eyes-open-left.png",
+      "parts/eyes-open-right.png",
+      "parts/eyes-half-left.png",
+      "parts/eyes-half-right.png",
+      "parts/eyes-closed-left.png",
+      "parts/eyes-closed-right.png"
+    ],
+    "mouths": [
+      "parts/mouth-closed.png",
+      "parts/mouth-half.png",
+      "parts/mouth-open.png"
+    ],
+    "accessories": [
+      "parts/glasses.png",
+      "parts/tie.png",
+      "parts/foot-left.png",
+      "parts/foot-right.png"
+    ]
+  },
+  "actions": {
+    "idle": 4,
+    "blink": 1.4,
+    "talk": 3.2,
+    "teach": 3.5,
+    "think": 3.4,
+    "surprise": 3.2,
+    "nod": 3,
+    "wave": 3.6
+  },
+  "runtime": {
+    "stylesheet": "xiaojiu-rig.css",
+    "script": "xiaojiu-rig.js",
+    "global": "XiaojiuRig",
+    "assemblyPreset": "xiaojiu-assembly-preset.json",
+    "legacyFacePreset": "xiaojiu-face-preset.json",
+    "assemblyEditor": "../tune.html"
+  }
+}

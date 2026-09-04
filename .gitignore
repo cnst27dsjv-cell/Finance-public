@@ -20,6 +20,15 @@ dist
 dist-ssr
 *.local
 
+# Local video tooling and generated previews
+video/**/.venv/
+video/**/.hyperframes/
+video/**/.thumbnails/
+video/**/.waveform-cache/
+video/**/renders/
+video/**/:memory:.ses
+video/lesson-video/**/*.mp4
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

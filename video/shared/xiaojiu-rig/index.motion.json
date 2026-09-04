@@ -1,0 +1,11 @@
+{
+  "duration": 32,
+  "maxStaticSec": 4.2,
+  "assertions": [
+    { "kind": "appearsBy", "selector": "#xiaojiu-demo", "bySec": 0.5 },
+    { "kind": "appearsBy", "selector": "#action-teach", "bySec": 12.5 },
+    { "kind": "appearsBy", "selector": "#action-wave", "bySec": 28.5 },
+    { "kind": "staysInFrame", "selector": "#xiaojiu-demo" },
+    { "kind": "keepsMoving", "withinSelector": "#stage" }
+  ]
+}

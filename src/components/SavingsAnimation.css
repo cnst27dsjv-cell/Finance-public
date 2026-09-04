@@ -1,0 +1,41 @@
+.savings-animation { display: grid; gap: 16px; }
+.savings-animation__stage { overflow: hidden; border: 1px solid var(--color-border-bright); border-radius: var(--radius-xl); background: var(--color-bg-secondary); box-shadow: var(--shadow-md); }
+.savings-animation__stage svg { display: block; width: 100%; height: auto; min-height: 260px; }
+.scene { opacity: 0; pointer-events: none; transform-origin: center; transition: opacity .55s ease, transform .55s ease; }
+.savings-animation__stage[data-scene="0"] .scene--title, .savings-animation__stage[data-scene="1"] .scene--choice, .savings-animation__stage[data-scene="2"] .scene--jar, .savings-animation__stage[data-scene="3"] .scene--flow, .savings-animation__stage[data-scene="4"] .scene--benefits, .savings-animation__stage[data-scene="5"] .scene--summary { opacity: 1; }
+.scene-title { fill: var(--color-secondary); font-size: 54px; font-weight: 800; }
+.scene-lead, .scene-copy, .benefit-copy, .flow-return-label { fill: var(--color-text-secondary); font-size: 21px; }
+.scene-heading { fill: var(--color-secondary); font-size: 29px; font-weight: 750; }
+.scene-heading--safe { fill: var(--color-success); }
+.scene-emoji, .flow-icon { font-size: 52px; }
+.teacher-slot-label { fill: var(--color-primary); font-size: 11px; }
+.coin-mark { fill: #fff; font-size: 46px; font-weight: 800; }
+.flow-label, .benefit-heading { fill: var(--color-secondary); font-size: 22px; font-weight: 750; }
+.benefit-number { fill: var(--color-primary); font-size: 25px; font-weight: 800; }
+.summary-copy { fill: var(--color-secondary); font-size: 32px; font-weight: 800; }
+.savings-animation__caption { min-height: 62px; display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-radius: var(--radius-md); background: var(--color-bg-secondary); }
+.savings-animation__caption strong { display: block; color: var(--color-secondary); }
+.savings-animation__caption p { margin-top: 2px; color: var(--color-text-secondary); font-size: 14px; }
+.savings-animation__scene-count { flex: 0 0 auto; padding: 2px 8px; border-radius: 999px; background: var(--color-primary); color: #fff; font-size: 12px; font-weight: 700; }
+.savings-animation__controls { display: flex; align-items: center; gap: 10px; }
+.savings-animation__controls button { padding: 8px 14px; border-radius: var(--radius-sm); background: var(--color-secondary); color: #fff; font-weight: 700; transition: background var(--transition-fast), transform var(--transition-fast); }
+.savings-animation__controls button:hover:not(:disabled) { background: var(--color-primary); transform: translateY(-1px); }
+.savings-animation__controls button:disabled { cursor: not-allowed; opacity: .55; }
+.savings-animation__progress { flex: 1; height: 8px; overflow: hidden; border-radius: 999px; background: var(--color-secondary-pale); }
+.savings-animation__progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--color-primary), #8ba3c5); transition: width .12s linear; }
+.savings-animation__time, .savings-animation__motion-note { color: var(--color-text-muted); font-size: 12px; }
+.savings-animation__motion-note { margin: -6px 0 0; }
+.savings-animation__stage[data-scene="2"] .jar-coin { animation: coin-drop 1.4s ease-in-out infinite; }
+.savings-animation__stage[data-scene="2"] .jar-coin--two { animation-delay: .25s; }
+.savings-animation__stage[data-scene="2"] .jar-coin--three { animation-delay: .5s; }
+.savings-animation__stage[data-scene="3"] .flow-node { animation: node-pulse 1.4s ease-in-out infinite alternate; }
+.savings-animation__stage[data-scene="3"] .flow-node:nth-of-type(2) { animation-delay: .18s; }
+.savings-animation__stage[data-scene="3"] .flow-node:nth-of-type(3) { animation-delay: .36s; }
+.savings-animation__stage[data-scene="4"] .benefit-card { animation: card-rise .55s ease both; }
+.savings-animation__stage[data-scene="4"] .benefit-card--2 { animation-delay: .16s; }
+.savings-animation__stage[data-scene="4"] .benefit-card--3 { animation-delay: .32s; }
+@keyframes coin-drop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(38px); } }
+@keyframes node-pulse { to { transform: translateY(-8px); } }
+@keyframes card-rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 640px) { .savings-animation__stage svg { min-height: 205px; } .scene-title { font-size: 58px; } .scene-heading { font-size: 31px; } .scene-copy, .scene-lead, .benefit-copy, .flow-return-label { font-size: 24px; } .benefit-heading, .flow-label { font-size: 25px; } .summary-copy { font-size: 35px; } .savings-animation__controls { flex-wrap: wrap; } .savings-animation__progress { order: 3; flex-basis: 100%; } }
+@media (prefers-reduced-motion: reduce) { .scene, .savings-animation__progress span { transition: none; } .jar-coin, .flow-node, .benefit-card { animation: none !important; } }

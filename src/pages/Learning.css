@@ -946,6 +946,33 @@
   padding: 32px;
 }
 
+.lesson-video-player-shell {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-border-bright);
+  border-radius: var(--radius-md);
+  background: #0b1020;
+  box-shadow: var(--shadow-md);
+  aspect-ratio: 16 / 9;
+}
+
+.lesson-video-player {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.lesson-video-error {
+  margin: 16px 0 0;
+  padding: 12px 16px;
+  border: 1px solid rgba(196, 70, 70, 0.35);
+  border-radius: var(--radius-sm);
+  background: rgba(196, 70, 70, 0.08);
+  color: #9d3030;
+  font-size: 14px;
+}
+
 .video-placeholder {
   background: rgba(255, 232, 186, 0.4);
   border-radius: var(--radius-md);
@@ -1324,6 +1351,10 @@
 
   .video-placeholder {
     padding: 24px;
+  }
+
+  .video-lesson {
+    padding: 16px;
   }
 
   .quiz-page {

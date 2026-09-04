@@ -1,0 +1,14 @@
+{
+  "duration": 173.662,
+  "maxStaticSec": 8,
+  "assertions": [
+    { "kind": "appearsBy", "selector": "#s01 .hand-title", "bySec": 3.9 },
+    { "kind": "appearsBy", "selector": "#s02 .factor.principal", "bySec": 18 },
+    { "kind": "appearsBy", "selector": "#s04 .big-number", "bySec": 83.2 },
+    { "kind": "appearsBy", "selector": "#s05 .stamp259", "bySec": 105.2 },
+    { "kind": "before", "a": "#s05 .formula", "b": "#s05 .stamp259" },
+    { "kind": "staysInFrame", "selector": "#s01 .bird-wrap" },
+    { "kind": "staysInFrame", "selector": "#s08 .bird-wrap" },
+    { "kind": "keepsMoving", "withinSelector": "#root" }
+  ]
+}
