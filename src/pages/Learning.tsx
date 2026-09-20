@@ -49,8 +49,7 @@ const COURSES: Course[] = [
     completed: false,
     contentType: 'video',
     lessons: [
-      { id: 'L1-2-1', title: '货币基金是什么', type: 'animation', duration: '60秒', completed: false },
-      { id: 'L1-2-2', title: '流动性与收益', type: 'animation', duration: '90秒', completed: false },
+      { id: 'L1-2-1', title: '货币基金入门', type: 'animation', duration: '3分10秒', completed: false },
       { id: 'L1-2-3', title: '章节测验', type: 'quiz', duration: '5题', completed: false },
     ],
   },
@@ -359,10 +358,10 @@ const QUIZZES: Record<string, { question: string; options: string[]; correct: nu
   ],
   'L1-2': [
     {
-      question: '货币基金的特点是？',
-      options: ['高风险高收益', '流动性好，收益稳定', '只能存一年', '不能随时取出'],
+      question: '关于货币基金的典型特点，哪项说法更准确？',
+      options: ['高风险且追求价格大幅上涨', '通常流动性较好、风险较低，常用于现金管理', '资金必须锁定一年', '本金和收益都由银行保证'],
       correct: 1,
-      explanation: '货币基金流动性好，风险低，适合管理零花钱！'
+      explanation: '货币基金主要投向短期、流动性较好的货币市场工具，通常流动性较好、风险较低，但不保本保收益。'
     },
     {
       question: '货币基金主要投资于哪类资产？',
@@ -374,19 +373,19 @@ const QUIZZES: Record<string, { question: string; options: string[]; correct: nu
       question: '观察货币基金近期收益表现时，常见的参考指标是什么？',
       options: ['七日年化收益率', '股票市盈率', '房屋租金率', '债券票面价格'],
       correct: 0,
-      explanation: '七日年化收益率是根据货币基金最近七日收益进行年化换算的参考指标，会随市场变化，不代表未来保证收益。'
+      explanation: '七日年化收益率根据最近七个自然日的每万份收益进行年化换算，只反映近期表现，不代表未来保证收益。'
     },
     {
-      question: '货币基金的风险水平是？',
-      options: ['高风险', '低风险', '中等风险', '零风险'],
+      question: '关于货币基金风险，哪项理解正确？',
+      options: ['完全没有风险', '通常风险较低，但仍有信用、利率和流动性等风险', '与高波动股票相同', '只要能赎回就不会亏损'],
       correct: 1,
-      explanation: '货币基金风险很低，适合保守型投资者！'
+      explanation: '货币基金通常风险较低，但不等于零风险，投资者仍需承担信用、利率和流动性等风险。'
     },
     {
-      question: '货币基金适合用来？',
-      options: ['存零花钱', '赚大钱', '买房首付', '养老钱'],
+      question: '哪类资金通常更适合用货币基金进行管理？',
+      options: ['近期可能使用的短期闲置资金', '用于追求短期暴利的资金', '必须保证本金不受任何损失的资金', '长期不用且希望获得高波动收益的资金'],
       correct: 0,
-      explanation: '货币基金适合管理短期闲置资金！'
+      explanation: '货币基金常用于管理近期可能使用的短期闲置资金，选择前仍要查看具体产品的风险和赎回规则。'
     }
   ],
   'L1-3': [
@@ -1206,20 +1205,21 @@ function Learning() {
     }
 
     if (selectedCourse.contentType === 'video') {
-      if (lesson.id === 'L1-1-1') {
+      if (lesson.id === 'L1-1-1' || lesson.id === 'L1-2-1') {
         return (
           <div className="video-lesson">
             <div className="lesson-video-player-shell">
               <video
+                key={lesson.id}
                 className="lesson-video-player"
                 controls
                 playsInline
                 preload="metadata"
-                aria-label="储蓄与复利课程视频"
+                aria-label={`${lesson.title}课程视频`}
                 onError={() => setVideoLoadError(true)}
               >
                 <source
-                  src="https://pub-3f213747c6ce4f89902e26c8aabe8e86.r2.dev/lessons/L1.mp4"
+                  src={`https://pub-3f213747c6ce4f89902e26c8aabe8e86.r2.dev/lessons/${lesson.id === 'L1-1-1' ? 'L1' : 'L2'}.mp4`}
                   type="video/mp4"
                 />
                 您的浏览器暂不支持视频播放。
