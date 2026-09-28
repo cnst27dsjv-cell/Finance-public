@@ -51,3 +51,10 @@ video/lesson-video/**/*.mp4
 .cache
 .temp
 .tmp
+
+# Private configuration and local agent sessions
+.env.*
+!.env.example
+.superpowers/
+*.pem
+*.key
