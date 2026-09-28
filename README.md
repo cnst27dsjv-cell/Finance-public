@@ -22,8 +22,8 @@ React 18 · TypeScript · Vite · React Router · Zustand · ECharts · Framer M
 准备 Node.js 22 与 npm，以及你自己的 Supabase 项目。
 
 ```bash
-git clone https://github.com/cnst27dsjv-cell/Finance.git
-cd Finance
+git clone https://github.com/cnst27dsjv-cell/Finance-public.git
+cd Finance-public
 npm ci
 cp .env.example .env.local
 ```
