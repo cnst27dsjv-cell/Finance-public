@@ -13,6 +13,34 @@
 - **登录与游客体验**：Supabase 邮箱认证，以及本地游客模式。
 - **课程动画素材**：仓库内保留部分视频制作工程和共享角色资源。
 
+## 界面预览
+
+以下截图来自项目实际运行界面，使用游客模式；账户金额、行情和持仓均为模拟数据。
+
+### 首页
+
+从账户概览进入课程学习、投资模拟与量化实验。
+
+![InvestQuest 首页与功能入口](docs/screenshots/home.png)
+
+### 课程学习
+
+按等级组织课程，从储蓄、复利等基础概念开始学习。
+
+![学习中心的课程列表](docs/screenshots/learning.png)
+
+### 课程视频
+
+「储蓄与复利」课程的实际播放画面，以动画和角色讲解呈现金融概念。
+
+![储蓄与复利课程视频播放界面](docs/screenshots/course-video.png)
+
+### 投资模拟
+
+查看模拟行情、K 线与技术指标，在虚拟资金环境中练习交易操作。
+
+![投资模拟器的行情图表与交易面板](docs/screenshots/simulator.png)
+
 ## 技术栈
 
 React 18 · TypeScript · Vite · React Router · Zustand · ECharts · Framer Motion · Supabase Auth
